@@ -200,15 +200,13 @@ pub enum ValueError {
 
 impl fmt::Display for ValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description())
+        write!(f, "{}", 
+            match self {
+                ValueError::OutOfBounds => "Value is out of range!",
+                ValueError::BadFormat   => "Value is malformed!",
+            }
+        )
     }
 }
 
-impl Error for ValueError {
-    fn description(&self) -> &str {
-        match self {
-            ValueError::OutOfBounds => "Value is out of range!",
-            ValueError::BadFormat   => "Value is malformed!",
-        }
-    }
-}
+impl Error for ValueError {}
