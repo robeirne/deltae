@@ -19,4 +19,4 @@ name = "readme"
 path = "examples/readme.rs"
 
 [dev-dependencies]
-clap = "2.32.0"
+clap = "2.33.0"
