@@ -61,6 +61,12 @@ impl Illuminant {
     }
 }
 
+impl Default for Illuminant {
+    fn default() -> Self {
+        Illuminant::D50
+    }
+}
+
 impl From<Illuminant> for XyzValue {
     fn from(illum: Illuminant) -> Self {
         match illum {
