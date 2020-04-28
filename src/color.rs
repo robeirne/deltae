@@ -193,17 +193,29 @@ impl fmt::Display for RgbValue {
 /// Value validation Error type
 pub enum ValueError {
     /// The value is outside the acceptable range
-    OutOfBounds,
+    OutOfBounds(String),
     /// The value is formatted incorrectly
-    BadFormat,
+    BadFormat(String),
+}
+
+impl ValueError {
+    /// Wraps an item in a OutOfBounds error
+    pub fn out_of_bounds<T: ToString>(t: T) -> Self {
+        ValueError::OutOfBounds(t.to_string())
+    }
+
+    /// Wraps an item in a BadFormat error
+    pub fn bad_format<T: ToString>(t: T) -> Self {
+        ValueError::BadFormat(t.to_string())
+    }
 }
 
 impl fmt::Display for ValueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", 
             match self {
-                ValueError::OutOfBounds => "Value is out of range!",
-                ValueError::BadFormat   => "Value is malformed!",
+                ValueError::OutOfBounds(val) => format!("value is out of range: '{}'", val),
+                ValueError::BadFormat(val) => format!("value is malformed: '{}'", val),
             }
         )
     }

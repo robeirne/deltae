@@ -12,7 +12,7 @@ impl Validate for LabValue {
            self.a < -128.0 || self.a > 128.0 ||
            self.b < -128.0 || self.b > 128.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(ValueError::out_of_bounds(self))
         } else {
             Ok(self)
         }
@@ -25,7 +25,7 @@ impl Validate for LchValue {
            self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
            self.h < 0.0 || self.h > 360.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(ValueError::out_of_bounds(self))
         } else {
             Ok(self)
         }
@@ -39,7 +39,7 @@ impl Validate for XyzValue {
            self.y < 0.0 || self.y > 1.0 ||
            self.z < 0.0 || self.z > 1.0
         {
-            Err(ValueError::OutOfBounds)
+            Err(ValueError::out_of_bounds(self))
         } else {
             Ok(self)
         }

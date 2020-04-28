@@ -76,7 +76,7 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
 
     // Check if it's the right number of items
     if v.len() != length || split.len() != length {
-        return Err(ValueError::BadFormat);
+        return Err(ValueError::bad_format(s));
     }
 
     Ok(split)
