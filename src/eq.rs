@@ -12,6 +12,19 @@ where
     D: Sized + Delta,
 {
     /// Determine if the delta between two colors is within a given `Tolerance`
+    /// # Example
+    /// ```
+    /// use deltae::{LabValue, Tolerance, DeltaEq, DEMethod::DE2000};
+    ///
+    /// let lab0 = LabValue::new(50.0, 20.0, 30.0).unwrap();
+    /// let lab1 = LabValue::new(50.1, 19.9, 30.2).unwrap();
+    /// let tol = Tolerance::new(DE2000, 1.0);
+    ///
+    /// assert!(lab0.delta_eq(lab1, tol));
+    ///
+    /// let lab2 = LabValue::new(55.0, 25.0, 35.0).unwrap();
+    /// assert!(!lab0.delta_eq(lab2, tol));
+    /// ```
     fn delta_eq<T: Into<Tolerance>>(self, other: D, tolerance: T) -> bool {
         let tolerance = tolerance.into();
         self.delta(other, tolerance.0.method) <= tolerance.0
