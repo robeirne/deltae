@@ -57,22 +57,24 @@ mod color;
 mod convert;
 mod delta;
 mod eq;
+mod parse;
 mod round;
 mod validate;
-mod matrix;
-mod parse;
+#[macro_use]
+pub mod matrix;
 pub mod illuminant;
 
 #[cfg(test)]
 mod tests;
 
-pub use DEMethod::*;
 pub use color::*;
+pub use convert::*;
 pub use delta::*;
 pub use eq::*;
+pub use parse::*;
 pub use round::*;
 pub use validate::*;
-pub use parse::*;
+pub use DEMethod::*;
 
 use std::fmt;
 use std::io;

@@ -1,6 +1,6 @@
 use crate::*;
 use illuminant::D50;
-use std::convert::TryFrom;
+pub use std::convert::TryFrom;
 
 // To Lab /////////////////////////////////////////////////////////////////////
 impl From<LchValue> for LabValue {
@@ -233,7 +233,7 @@ impl TryFrom<&(f32, f32, f32)> for XyzValue {
     }
 }
 
-// To RGB
+// To RGB //////////////////////////////////////////////////////////////////////
 impl From<LabValue> for RgbValue {
     fn from(lab: LabValue) -> Self {
         todo!()
@@ -251,7 +251,7 @@ const KAPPA: f32 = 24389.0 / 27.0; // CIE Standard: 903.3
 const EPSILON: f32 = 216.0 / 24389.0; // CIE Standard: 0.008856
 const CBRT_EPSILON: f32 = 0.20689655172413796;
 
-pub fn get_h_prime(a: f32, b: f32) -> f32 {
+pub(crate) fn get_h_prime(a: f32, b: f32) -> f32 {
     let h_prime = b.atan2(a).to_degrees();
     if h_prime < 0.0 {
         h_prime + 360.0

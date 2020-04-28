@@ -1,9 +1,9 @@
 use crate::*;
 
-/// Trait to determine color difference between various types.
-/// As long as the type can be converted to Lab, we can calculate DeltaE.
+/// Trait to determine color difference between various types.  The `Delta` trait is implemented
+/// for any type that can be converted to a `LabValue` (implements `Into<LabValue>`).
 pub trait Delta where Self: Into<LabValue> {
-    /// Calculate DeltaE between 2 types
+    /// # Example
     /// ```
     /// use deltae::*;
     ///
