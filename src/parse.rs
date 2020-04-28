@@ -1,3 +1,5 @@
+//! Definitions for how to parse various types from strings reside here.
+
 use crate::*;
 use std::str::FromStr;
 

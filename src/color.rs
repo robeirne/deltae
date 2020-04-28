@@ -14,7 +14,7 @@
 //!         h: 269.09903,
 //!     };
 //!
-//!     assert!(lab0.in_tolerance(lch0, &Tolerance::default()));
+//!     assert!(lab0.delta_eq(lch0, &Tolerance::default()));
 //!
 //!     let lch0 = LchValue::from(lab0);
 //!     let lab2 = LabValue::from(lch0);

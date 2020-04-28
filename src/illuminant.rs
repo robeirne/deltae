@@ -28,6 +28,7 @@ pub const F11: XyzValue = XyzValue { x: 1.00962, y: 1.00000, z: 0.64350 };
 
 /// Common Standard Illuminant Types.
 /// This list is not exhaustive.
+#[non_exhaustive]
 #[derive(Debug, Copy, Clone)]
 pub enum Illuminant {
     /// Tungsten-filament (incandescent)

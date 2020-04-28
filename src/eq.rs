@@ -5,20 +5,23 @@
 use crate::*;
 use delta::Delta;
 
-/// A trait for determining if a color is within a DeltaE tolerance
-pub trait DeTolerance
+/// A trait for determining if a color is equivalent to another within a DeltaE tolerance
+pub trait DeltaEq<D>
 where
     Self: Sized + Delta,
+    D: Sized + Delta,
 {
-    fn in_tolerance<D: Delta>(self, other: D, tolerance: &Tolerance) -> bool {
-        self.delta(other, &tolerance.0.method) <= tolerance.0
+    /// Determine if the delta between two colors is within a given `Tolerance`
+    fn delta_eq<T: Into<Tolerance>>(self, other: D, tolerance: T) -> bool {
+        let tolerance = tolerance.into();
+        self.delta(other, tolerance.0.method) <= tolerance.0
     }
 }
 
-impl<T> DeTolerance for T where T: Sized + Delta {}
+impl<D, T> DeltaEq<D> for T where D: Delta, T: Delta {}
 
 /// A wrapper around DeltaE for defining a tolerance for the DeltaEq trait
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct Tolerance(DeltaE);
 
 impl Tolerance {
@@ -36,15 +39,21 @@ impl Default for Tolerance {
     }
 }
 
+impl From<&Self> for Tolerance {
+    fn from(tolerance: &Self) -> Self {
+        *tolerance
+    }
+}
+
 impl From<&DeltaE> for Tolerance {
     fn from(de: &DeltaE) -> Self {
-        Tolerance(de.clone())
+        Tolerance(*de)
     }
 }
 
 impl From<DeltaE> for Tolerance {
     fn from(de: DeltaE) -> Self {
-        Tolerance::from(&de)
+        Tolerance(de)
     }
 }
 

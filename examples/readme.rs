@@ -12,21 +12,21 @@ fn main() -> Result<(), Box<dyn Error>>{
     }.validate()?; // Validate that the values are in range
 
     // Calculate DeltaE between two lab values
-    let de0 = DeltaE::new(&lab0, &lab1, &DE2000);
+    let de0 = DeltaE::new(&lab0, &lab1, DE2000);
     // Use the Delta trait
-    let de1 = lab0.delta(lab1, &DE2000);
+    let de1 = lab0.delta(lab1, DE2000);
     assert_eq!(de0, de1);
 
     // Convert to other color types
     let lch0 = LchValue::from(lab0);
     let xyz0 = XyzValue::from(lab1);
-    assert!(lch0.in_tolerance(lab0, &Tolerance::default()));
-    let de2 = xyz0.delta(lab1, &DE2000);
+    assert!(lch0.delta_eq(lab0, Tolerance::default()));
+    let de2 = xyz0.delta(lab1, DE2000);
     dbg!(de2);
-    assert!(xyz0.in_tolerance(lab1, &Tolerance::default()));
+    assert!(xyz0.delta_eq(lab1, Tolerance::default()));
 
     // Calculate DeltaE between different color types
-    let de2 = lch0.delta(xyz0, &DE2000);
+    let de2 = lch0.delta(xyz0, DE2000);
     assert_eq!(de2.round_to(4), de0.round_to(4));
     // There is some loss of accuracy in the conversion.
     // Usually rounding to 4 decimal places is more than enough.

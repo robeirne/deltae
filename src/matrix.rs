@@ -37,7 +37,7 @@ impl<'a> FromIterator<&'a f32> for Matrix3x3 {
 #[test]
 fn matrix_from_iter() {
     let arr = [1.0_f32, 2.0, 3.0, 4.0, 5.0];
-    let matrix = arr.into_iter().collect::<Matrix3x3>();
+    let matrix = arr.iter().collect::<Matrix3x3>();
     let exp = Matrix3x3 {
         inner: [
             1.0, 2.0, 3.0, 4.0, 5.0, 1.0, 1.0, 1.0, 1.0
