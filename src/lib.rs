@@ -89,9 +89,9 @@ pub(crate) type ValueResult<T> = Result<T, color::ValueError>;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct DeltaE {
     /// The mathematical method used for calculating color difference
-    pub method: DEMethod,
+    method: DEMethod,
     /// The calculated value
-    pub value: f32,
+    value: f32,
 }
 
 impl DeltaE {
@@ -100,12 +100,49 @@ impl DeltaE {
     where A: Delta, B: Delta {
         a.delta(b, method)
     }
+
+    /// Gets the `DEMethod` used to calculate `DeltaE`
+    pub fn method(&self) -> &DEMethod {
+        &self.method
+    }
+
+    /// Gets the numerical value of the `DeltaE`
+    pub fn value(&self) -> &f32 {
+        &self.value
+    }
+}
+
+pub(crate) fn fmt_prec<D: fmt::Display>(f: &fmt::Formatter, d: D) -> String {
+    if let Some(precision) = f.precision() {
+        format!("{:.*}", precision, d)
+    } else {
+        format!("{}", d)
+    }
 }
 
 impl fmt::Display for DeltaE {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", &self.value)
+        write!(f, "{} {}", fmt_prec(f, self.value), fmt_prec(f, self.method))
     }
+}
+
+#[test]
+fn deltae_display() {
+    let de = DeltaE { method: DE2000, value: 1.0 };
+    assert_eq!(
+        format!("{}", de),
+        "1 DE2000"
+    );
+    assert_eq!(
+        format!("{:.4}", de),
+        "1.0000 DE2000"
+    );
+
+    let de = DeltaE { method: DECMC(1.0, 1.0), value: 1.0 };
+    assert_eq!(
+        format!("{:.4}", de),
+        "1.0000 DECMC(1.0000:1.0000)"
+    );
 }
 
 impl PartialEq<f32> for DeltaE {
@@ -154,12 +191,10 @@ impl fmt::Display for DEMethod {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             DECMC(tl, tc) => {
-                if (tl, tc) == (&1.0, &1.0) {
-                    write!(f, "DECMC1")
-                } else if (tl, tc) == (&2.0, &1.0) {
-                    write!(f, "DECMC2")
+                if let Some(p) = f.precision() {
+                    write!(f, "DECMC({:.*}:{:.*})", p, tl, p, tc)
                 } else {
-                    write!(f, "DECMC({:0.2}:{:0.2})", tl, tc)
+                    write!(f, "DECMC({}:{})", tl, tc)
                 }
             }
             _ => write!(f, "{:?}", self)
@@ -167,3 +202,18 @@ impl fmt::Display for DEMethod {
     }
 }
 
+#[test]
+fn de_method_display() {
+    assert_eq!(
+        format!("{:.4}", DEMethod::DECMC(3.0, 4.0)),
+        "DECMC(3.0000:4.0000)"
+    );
+    assert_eq!(
+        format!("{}", DEMethod::DECMC(1.0, 2.0)),
+        "DECMC(1:2)"
+    );
+    assert_eq!(
+        format!("{}", DEMethod::DE2000),
+        "DE2000"
+    );
+}
