@@ -61,6 +61,7 @@ mod round;
 mod validate;
 mod matrix;
 pub mod illuminant;
+pub mod parse;
 
 #[cfg(test)]
 mod tests;
