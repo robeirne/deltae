@@ -49,7 +49,7 @@ impl Round for XyzValue {
 #[test]
 fn round() {
     let val = 1.234567890;
-    let rnd = round::round_to(val, 4);
+    let rnd = round_to(val, 4);
     assert_eq!(rnd, 1.2346);
     assert_ne!(rnd, val);
 }

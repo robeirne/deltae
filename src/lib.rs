@@ -60,12 +60,15 @@ mod eq;
 mod parse;
 mod round;
 mod validate;
-#[macro_use]
-pub mod matrix;
-pub mod illuminant;
 
 #[cfg(test)]
 mod tests;
+
+pub mod illuminant;
+#[macro_use]
+pub mod matrix;
+pub mod nominalize;
+pub mod rgb;
 
 pub use color::*;
 pub use convert::*;

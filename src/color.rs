@@ -30,8 +30,11 @@
 use std::fmt;
 use std::error::Error;
 
-use crate::ValueResult;
-use crate::validate::Validate;
+use crate::{
+    ValueResult,
+    rgb,
+    validate::Validate,
+};
 
 /// # CIEL\*a\*b\*
 ///
@@ -67,7 +70,14 @@ impl Default for LabValue {
 
 impl fmt::Display for LabValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[L:{}, a:{}, b:{}]", self.l, self.a, self.b)
+        if let Some(p) = f.precision() {
+            write!(f,
+                "[L:{:.*}, a:{:.*}, b:{:.*}]",
+                p, self.l, p, self.a, p, self.b
+            )
+        } else {
+            write!(f, "[L:{}, a:{}, b:{}]", self.l, self.a, self.b)
+        }
     }
 }
 
@@ -110,7 +120,14 @@ impl Default for LchValue {
 
 impl fmt::Display for LchValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
+        if let Some(p) = f.precision() {
+            write!(f,
+                "[L:{:.*}, c:{:.*}, h:{:.*}]",
+                p, self.l, p, self.c, p, self.h
+            )
+        } else {
+            write!(f, "[L:{}, c:{}, h:{}]", self.l, self.c, self.h)
+        }
     }
 }
 
@@ -138,6 +155,11 @@ impl XyzValue {
     pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
         XyzValue {x, y, z}.validate()
     }
+
+    /// Convert an `XyzValue` to an `RgbValue` in a given `RgbSystem`
+    pub fn to_rgb(&self, rgb_system: rgb::RgbSystem) -> RgbValue {
+        rgb::xyz_to_rgb(*self, rgb_system)
+    }
 }
 
 impl Default for XyzValue {
@@ -148,7 +170,15 @@ impl Default for XyzValue {
 
 impl fmt::Display for XyzValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[X:{}, Y:{}, Z:{}]", self.x, self.y, self.z)
+        if let Some(p) = f.precision() {
+            write!(
+                f,
+                "[X:{:.*}, Y:{:.*}, Z:{:.*}]",
+                p, self.x, p, self.y, p, self.z
+            )
+        } else {
+            write!(f, "[X:{}, Y:{}, Z:{}]", self.x, self.y, self.z)
+        }
     }
 }
 
@@ -175,6 +205,31 @@ impl RgbValue {
     pub fn new(r: u8, g: u8, b: u8) -> Self {
         RgbValue { r, g, b }
     }
+
+    /// Convert an `RgbValue` wit a given `RgbSystem` to an `XyzValue`
+    pub fn to_xyz(&self, rgb_system: rgb::RgbSystem) -> XyzValue {
+        rgb::rgb_to_xyz(*self, rgb_system)
+    }
+
+    /// Invert the color
+    pub fn invert(&self) -> RgbValue {
+        RgbValue {
+            r: 255 - self.r,
+            g: 255 - self.g,
+            b: 255 - self.b,
+        }
+    }
+}
+
+#[test]
+fn rgb_invert() {
+    let rgb = RgbValue::new(0, 0, 0).invert();
+    let exp = RgbValue::new(255, 255, 255);
+    assert_eq!(rgb, exp);
+
+    let rgb = RgbValue::new(64, 128, 192).invert();
+    let exp = RgbValue::new(191, 127, 63);
+    assert_eq!(rgb, exp);
 }
 
 impl Default for RgbValue {

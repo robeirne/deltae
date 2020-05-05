@@ -45,6 +45,12 @@ impl From<&XyzValue> for LabValue {
     }
 }
 
+impl From<RgbValue> for LabValue {
+    fn from(rgb: RgbValue) -> LabValue {
+        LabValue::from(XyzValue::from(rgb))
+    }
+}
+
 impl TryFrom<&[f32; 3]> for LabValue {
     type Error = ValueError;
     fn try_from(slice: &[f32; 3]) -> ValueResult<LabValue> {
@@ -200,6 +206,18 @@ impl From<&LchValue> for XyzValue {
     }
 }
 
+impl From<RgbValue> for XyzValue {
+    fn from(rgb: RgbValue) -> XyzValue {
+        rgb.to_xyz(rgb::RgbSystem::default())
+    }
+}
+
+impl From<&RgbValue> for XyzValue {
+    fn from(rgb: &RgbValue) -> XyzValue {
+        XyzValue::from(*rgb)
+    }
+}
+
 impl TryFrom<&[f32; 3]> for XyzValue {
     type Error = ValueError;
     fn try_from(slice: &[f32; 3]) -> ValueResult<XyzValue> {
@@ -236,13 +254,13 @@ impl TryFrom<&(f32, f32, f32)> for XyzValue {
 // To RGB //////////////////////////////////////////////////////////////////////
 impl From<LabValue> for RgbValue {
     fn from(lab: LabValue) -> Self {
-        todo!()
+        XyzValue::from(lab).to_rgb(rgb::RgbSystem::default())
     }
 }
 
 impl From<&LabValue> for RgbValue {
     fn from(lab: &LabValue) -> Self {
-        todo!()
+        RgbValue::from(*lab)
     }
 }
 
