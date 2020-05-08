@@ -79,7 +79,7 @@ pub(crate) fn xyz_to_rgb(xyz: XyzValue, rgb_system: RgbSystem) -> RgbValue {
         RgbSystem::WideGamut => WIDEGAMUTRGB_D50_XYZ2RGB,
     };
 
-    matrix * xyz
+    (matrix * Matrix3x1::from(xyz)).into()
 }
 
 pub(crate) fn rgb_to_xyz(rgb: RgbValue, rgb_system: RgbSystem) -> XyzValue {
@@ -101,7 +101,7 @@ pub(crate) fn rgb_to_xyz(rgb: RgbValue, rgb_system: RgbSystem) -> XyzValue {
         RgbSystem::WideGamut => WIDEGAMUTRGB_D50_RGB2XYZ,
     };
 
-    matrix * rgb
+    (matrix * Matrix3x1::from(rgb)).into()
 }
 
 #[test]

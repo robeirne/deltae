@@ -98,3 +98,26 @@ fn denominalize_rgb() {
     assert_eq!(RgbNominalValue::default().denominalize().r, 0);
 }
 
+pub(crate) trait Clamp {
+    fn clamp(self) -> Self;
+}
+
+impl Clamp for RgbNominalValue {
+    fn clamp(self) -> Self {
+        RgbNominalValue {
+            r: clamp(self.r, 0.0, 1.0),
+            g: clamp(self.g, 0.0, 1.0),
+            b: clamp(self.b, 0.0, 1.0),
+        }
+    }
+}
+
+fn clamp(val: f32, low: f32, high: f32) -> f32 {
+    if val < low {
+        low
+    } else if val > high {
+        high
+    } else {
+        val
+    }
+}

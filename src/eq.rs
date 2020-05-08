@@ -12,7 +12,9 @@ where
     D: Sized + Delta,
 {
     /// Determine if the delta between two colors is within a given `Tolerance`
+    ///
     /// # Example
+    ///
     /// ```
     /// use deltae::{LabValue, Tolerance, DeltaEq, DEMethod::DE2000};
     ///
@@ -25,6 +27,7 @@ where
     /// let lab2 = LabValue::new(55.0, 25.0, 35.0).unwrap();
     /// assert!(!lab0.delta_eq(lab2, tol));
     /// ```
+    ///
     fn delta_eq<T: Into<Tolerance>>(self, other: D, tolerance: T) -> bool {
         let tolerance = tolerance.into();
         self.delta(other, tolerance.0.method) <= tolerance.0
@@ -79,5 +82,100 @@ impl PartialEq<DeltaE> for Tolerance {
 impl PartialEq<Tolerance> for DeltaE {
     fn eq(&self, other: &Tolerance) -> bool {
         self == &other.0
+    }
+}
+
+/// Trait to determine if values are almost equivalent despite rounding errors
+/// 
+/// # Example
+///
+/// ```
+/// use deltae::AlmostEq;
+///
+/// struct MyStruct(f64);
+///
+/// impl AlmostEq<Self, f64> for MyStruct {
+///     const TOLERANCE: f64 = 1e-5;
+///     fn almost_eq(&self, rhs: &Self) -> bool {
+///         (self.0 - rhs.0).abs() < Self::TOLERANCE
+///     }
+/// }
+///
+/// #[test]
+/// fn test_almost_eq() {
+///     assert_almost_eq!(MyStruct(1.000000), MyStruct(1.000001));
+///     assert_almost_ne!(MyStruct(1.00000), MyStruct(1.00001));
+/// }
+/// ```
+///
+pub trait AlmostEq<Rhs, T> {
+    /// The maximum difference between to values in order to be considered almost equal
+    const TOLERANCE: T;
+    /// Should return true if the absolute difference between the two values is less than the
+    /// `TOLERANCE`
+    fn almost_eq(&self, rhs: &Rhs) -> bool;
+}
+
+/// Convenience macro for the `AlmostEq` trait
+///
+/// # Example
+///
+/// ```
+/// use deltae::{AlmostEq, assert_almost_eq};
+///
+/// assert_almost_eq!(1.000000_f32, 1.000001_f32);
+/// ```
+///
+#[macro_export]
+macro_rules! assert_almost_eq {
+    ($lhs:expr, $rhs: expr) => {
+        assert!($lhs.almost_eq(&$rhs))
+    }
+}
+
+/// Convenience macro for the `AlmostEq` trait
+///
+/// # Example
+///
+/// ```
+/// use deltae::{AlmostEq, assert_almost_ne};
+///
+/// assert_almost_ne!(1.0_f32, 1.1_f32);
+/// ```
+///
+#[macro_export]
+macro_rules! assert_almost_ne {
+    ($lhs:expr, $rhs: expr) => {
+        assert!(!$lhs.almost_eq(&$rhs))
+    }
+}
+
+#[test]
+fn almost_eq_ne() {
+    assert_almost_eq!(1.0, 1.0);
+    assert_almost_eq!(1.000000, 1.000001);
+    assert_almost_ne!(1.0, 1.1);
+    assert_almost_ne!(1.00000, 1.00001);
+}
+
+impl AlmostEq<f32, f32> for f32 {
+    const TOLERANCE: f32 = 1e-5;
+    fn almost_eq(&self, rhs: &f32) -> bool {
+        (self - rhs).abs() < Self::TOLERANCE
+    }
+}
+
+impl AlmostEq<f64, f64> for f64 {
+    const TOLERANCE: f64 = 1e-5;
+    fn almost_eq(&self, rhs: &f64) -> bool {
+        (self - rhs).abs() < Self::TOLERANCE
+    }
+}
+
+impl AlmostEq<Self, f32> for DeltaE {
+    const TOLERANCE: f32 = f32::TOLERANCE;
+    fn almost_eq(&self, rhs: &Self) -> bool {
+        self.method == rhs.method
+            && self.value.almost_eq(&rhs.value)
     }
 }

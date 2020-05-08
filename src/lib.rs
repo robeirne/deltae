@@ -53,9 +53,11 @@
 //! }
 //! ```
 
+mod chromatic_adaptation;
 mod color;
 mod convert;
 mod delta;
+#[macro_use]
 mod eq;
 mod parse;
 mod round;

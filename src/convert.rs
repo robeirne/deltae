@@ -27,9 +27,9 @@ impl From<&LabValue> for LabValue {
 
 impl From<XyzValue> for LabValue {
     fn from(xyz: XyzValue) -> LabValue {
-        let x = xyz_to_lab_map(xyz.x / D50.x);
-        let y = xyz_to_lab_map(xyz.y / D50.y);
-        let z = xyz_to_lab_map(xyz.z / D50.z);
+        let x = xyz_to_lab_map(xyz.x / D50[0]);
+        let y = xyz_to_lab_map(xyz.y / D50[1]);
+        let z = xyz_to_lab_map(xyz.z / D50[2]);
 
         LabValue {
             l: (116.0 * y) - 16.0,
@@ -175,9 +175,9 @@ impl From<LabValue> for XyzValue {
         };
 
         XyzValue {
-            x: xr * D50.x,
-            y: yr * D50.y,
-            z: zr * D50.z,
+            x: xr * D50[0],
+            y: yr * D50[1],
+            z: zr * D50[2],
         }
     }
 }
