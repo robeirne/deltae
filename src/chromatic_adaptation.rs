@@ -2,15 +2,78 @@ use crate::*;
 use matrix::*;
 use illuminant::*;
 
+pub use ChromaticAdaptationMethod::*;
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum ChromaticAdaptationMethod {
     XyzScaling,
     Bradford,
     VonKries,
 }
 
-impl XyzValue {
-    fn chrom_adapt(self, source: Illuminant, dest: Illuminant) {
+pub struct ConeResponseDomain {
+    rho: f32,
+    gamma: f32,
+    beta: f32,
+}
 
+impl ConeResponseDomain {
+    pub fn scaled_component_matrix(self, dest: Self) -> Matrix3x3 {
+        matrix3x3![
+            dest.rho/self.rho, 0.0, 0.0;
+            0.0, dest.gamma/self.gamma, 0.0;
+            0.0, 0.0, dest.beta/self.beta;
+        ]
+    }
+}
+
+impl From<Matrix3x1> for ConeResponseDomain {
+    fn from(matrix: Matrix3x1) -> Self {
+        ConeResponseDomain {
+            rho: matrix[0],
+            gamma: matrix[1],
+            beta: matrix[2],
+        }
+    }
+}
+
+impl From<ConeResponseDomain> for Matrix3x1 {
+    fn from(crd: ConeResponseDomain) -> Self {
+        Matrix3x1::new(crd.rho, crd.gamma, crd.beta)
+    }
+}
+
+impl XyzValue {
+    /// Adapt an `XyzValue` to another Illuminant using a given
+    /// `ChromaticAdaptationMethod`
+    pub fn chrom_adapt(
+        self,
+        method: ChromaticAdaptationMethod,
+        source: Illuminant,
+        dest: Illuminant
+    ) -> Self {
+        let method_matrix = match method {
+            XyzScaling => XYZ_SCALING,
+            Bradford => BRADFORD,
+            VonKries => VON_KRIES,
+        };
+
+        let method_matrix_inv = match method {
+            XyzScaling => XYZ_SCALING,
+            Bradford => BRADFORD_INV,
+            VonKries => VON_KRIES_INV,
+        };
+
+        let crd_source: ConeResponseDomain =
+            (method_matrix * Matrix3x1::from(source)).into();
+        let crd_dest: ConeResponseDomain =
+            (method_matrix * Matrix3x1::from(dest)).into();
+
+        let scm = crd_source.scaled_component_matrix(crd_dest);
+
+        let matrix = method_matrix_inv * scm * method_matrix;
+
+        (matrix * Matrix3x1::from(source)).into()
     }
 }
 

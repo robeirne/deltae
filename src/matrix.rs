@@ -67,25 +67,22 @@ impl Matrix3x3 {
         }
     }
 
-    /// Return the red primary component as an `XyzValue`
-    pub fn xyz_red(&self) -> Matrix3x1 {
-        Matrix3x1::from(&[
-            self.inner[0], self.inner[1], self.inner[2]
-        ])
+    /// Returns a column as a 3x1 matrix.
+    /// Panics if the `col` is greater than 2
+    pub fn col(&self, col: usize) -> Matrix3x1 {
+        if col > 2 {
+            panic!("column index is {} but the column length is 2", col);
+        } else {
+            Matrix3x1::new(self[(col,0)], self[(col,1)], self[(col,2)])
+        }
     }
 
-    /// Return the green primary component as an `XyzValue`
-    pub fn xyz_green(&self) -> Matrix3x1 {
-        Matrix3x1::from(&[
-            self.inner[3], self.inner[4], self.inner[5]
-        ])
-    }
-
-    /// Return the blue primary component as an `XyzValue`
-    pub fn xyz_blue(&self) -> Matrix3x1 {
-        Matrix3x1::from(&[
-            self.inner[6], self.inner[7], self.inner[8]
-        ])
+    fn from_cols(col0: Matrix3x1, col1: Matrix3x1, col2: Matrix3x1) -> Self {
+        matrix3x3![
+            col0[0], col1[0], col2[0];
+            col0[1], col1[1], col2[1];
+            col0[2], col1[2], col2[2];
+        ]
     }
 }
 
@@ -197,6 +194,13 @@ const TEST_MATRIX_3X1: Matrix3x1 = Matrix3x1::new(0.0, 0.1, 0.2);
 #[cfg(test)]
 const TEST_MATRIX_3X1_ANSWER: Matrix3x1 = Matrix3x1::new(0.50, 0.53, 0.56);
 
+#[cfg(test)]
+const TEST_MATRIX_3X3_ANSWER: Matrix3x3 = matrix3x3![
+    0.5, 3.5, 6.5;
+    0.53, 3.83, 7.13;
+    0.56, 4.16, 7.76;
+];
+
 #[test]
 fn matrix_index() {
     assert_eq!(TEST_MATRIX_3X3[0], 0.0);
@@ -307,6 +311,26 @@ impl Index<usize> for Matrix3x1 {
     }
 }
 
+
+impl Mul<Self> for Matrix3x3 {
+    type Output = Self;
+    fn mul(self, rhs: Self) -> Self::Output {
+        Matrix3x3::from_cols(
+            self.col(0) * rhs,
+            self.col(1) * rhs,
+            self.col(2) * rhs,
+        )
+    }
+}
+
+#[test]
+fn matrix3x3_mul_matrix3x3() {
+    assert_almost_eq!(
+        TEST_MATRIX_3X3 * TEST_MATRIX_3X3,
+        TEST_MATRIX_3X3_ANSWER
+    )
+}
+
 impl Mul<Matrix3x1> for Matrix3x3 {
     type Output = Matrix3x1;
     fn mul(self, rhs: Matrix3x1) -> Self::Output {
@@ -326,9 +350,17 @@ impl Mul<Matrix3x1> for Matrix3x3 {
     }
 }
 
+impl Mul<Matrix3x3> for Matrix3x1 {
+    type Output = Matrix3x1;
+    fn mul(self, rhs: Matrix3x3) -> Self::Output {
+        rhs * self
+    }
+}
+
 #[test]
 fn matrix3x3_mul_matrix3x1() {
     assert_almost_eq!(TEST_MATRIX_3X3 * TEST_MATRIX_3X1, TEST_MATRIX_3X1_ANSWER);
+    assert_almost_eq!(TEST_MATRIX_3X1 * TEST_MATRIX_3X3, TEST_MATRIX_3X1_ANSWER);
 }
 
 impl RgbNominalValue {
