@@ -23,9 +23,9 @@ impl ChromaticAdaptationMethod {
 }
 
 pub struct ConeResponseDomain {
-    rho: f32,
-    gamma: f32,
-    beta: f32,
+    rho: f64,
+    gamma: f64,
+    beta: f64,
 }
 
 impl ConeResponseDomain {

@@ -42,7 +42,7 @@ pub struct Tolerance(DeltaE);
 
 impl Tolerance {
     /// Construct a new Tolerance from a value and a DeMethod
-    pub fn new(method: DEMethod, value: f32) -> Self {
+    pub fn new(method: DEMethod, value: f64) -> Self {
         Tolerance(
             DeltaE { method, value }
         )
@@ -114,6 +114,11 @@ pub trait AlmostEq<Rhs, T> {
     /// Should return true if the absolute difference between the two values is less than the
     /// `TOLERANCE`
     fn almost_eq(&self, rhs: &Rhs) -> bool;
+
+    /// Return the tolerance value for the type
+    fn tolerance(&self) -> T {
+        Self::TOLERANCE
+    }
 }
 
 /// Convenience macro for the [`AlmostEq`] trait. Panics if the two items are not equivalent within
@@ -124,7 +129,7 @@ pub trait AlmostEq<Rhs, T> {
 /// ```
 /// use deltae::{AlmostEq, assert_almost_eq};
 ///
-/// assert_almost_eq!(1.000000_f32, 1.000001_f32);
+/// assert_almost_eq!(1.000000_f64, 1.000001_f64);
 /// ```
 ///
 /// [`AlmostEq`]:trait.AlmostEq.html
@@ -133,8 +138,8 @@ macro_rules! assert_almost_eq {
     ($lhs:expr, $rhs:expr) => {
         if !$lhs.almost_eq(&$rhs) {
             panic!(
-                "assertion failed: `(left ~= right)`\n  left: `{:?}`\n right: `{:?}`",
-                $lhs, $rhs
+                "assertion failed: (left ~= right)\n  left: {:?}\n right: {:?}\n   tol: {:?}",
+                $lhs, $rhs, $lhs.tolerance(),
             );
         }
     }
@@ -148,7 +153,7 @@ macro_rules! assert_almost_eq {
 /// ```
 /// use deltae::{AlmostEq, assert_almost_ne};
 ///
-/// assert_almost_ne!(1.0_f32, 1.1_f32);
+/// assert_almost_ne!(1.0_f64, 1.1_f64);
 /// ```
 ///
 /// [`AlmostEq`]:trait.AlmostEq.html
@@ -157,8 +162,8 @@ macro_rules! assert_almost_ne {
     ($lhs:expr, $rhs:expr) => {
         if $lhs.almost_eq(&$rhs) {
             panic!(
-                "assertion failed: `(left !~= right)`\n  left: `{:?}`\n right: `{:?}`",
-                $lhs, $rhs
+                "assertion failed: (left !~= right)\n  left: {:?}\n right: {:?}\n   tol: {:?}",
+                $lhs, $rhs, $lhs.tolerance(),
             );
         }
     }
@@ -172,13 +177,6 @@ fn almost_eq_ne() {
     assert_almost_ne!(1.00000, 1.00001);
 }
 
-impl AlmostEq<f32, f32> for f32 {
-    const TOLERANCE: f32 = 1e-5;
-    fn almost_eq(&self, rhs: &f32) -> bool {
-        (self - rhs).abs() < Self::TOLERANCE
-    }
-}
-
 impl AlmostEq<f64, f64> for f64 {
     const TOLERANCE: f64 = 1e-5;
     fn almost_eq(&self, rhs: &f64) -> bool {
@@ -186,19 +184,35 @@ impl AlmostEq<f64, f64> for f64 {
     }
 }
 
-impl AlmostEq<Self, f32> for DeltaE {
-    const TOLERANCE: f32 = f32::TOLERANCE;
+//impl AlmostEq<f64, f64> for f64 {
+    //const TOLERANCE: f64 = 1e-5;
+    //fn almost_eq(&self, rhs: &f64) -> bool {
+        //(self - rhs).abs() < Self::TOLERANCE
+    //}
+//}
+
+impl AlmostEq<Self, f64> for DeltaE {
+    const TOLERANCE: f64 = f64::TOLERANCE;
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.method == rhs.method
             && self.value.almost_eq(&rhs.value)
     }
 }
 
-impl AlmostEq<Self, f32> for LabValue {
-    const TOLERANCE: f32 = f32::TOLERANCE;
+impl AlmostEq<Self, f64> for LabValue {
+    const TOLERANCE: f64 = f64::TOLERANCE;
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.l.almost_eq(&rhs.l)
             && self.a.almost_eq(&rhs.a)
+            && self.b.almost_eq(&rhs.b)
+    }
+}
+
+impl AlmostEq<Self, f64> for nominalize::RgbNominalValue {
+    const TOLERANCE: f64 = f64::TOLERANCE;
+    fn almost_eq(&self, rhs: &Self) -> bool {
+        self.r.almost_eq(&rhs.r)
+            && self.g.almost_eq(&rhs.g)
             && self.b.almost_eq(&rhs.b)
     }
 }

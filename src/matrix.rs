@@ -71,16 +71,16 @@ macro_rules! matrix3x1 {
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Matrix3x3 {
     /// The internal contents of te matrix
-    pub inner: [f32; 9],
+    pub inner: [f64; 9],
 }
 
 impl Matrix3x3 {
     /// Create a new [`Matrix3x3`](struct.Matrix3x3.html) from a list of floats in column-major
     /// order.
     pub const fn new(
-        x0: f32, y0: f32, z0: f32,
-        x1: f32, y1: f32, z1: f32,
-        x2: f32, y2: f32, z2: f32
+        x0: f64, y0: f64, z0: f64,
+        x1: f64, y1: f64, z1: f64,
+        x2: f64, y2: f64, z2: f64
     ) -> Self {
         Matrix3x3 {
             inner: [
@@ -111,14 +111,14 @@ impl Matrix3x3 {
 }
 
 impl Index<usize> for Matrix3x3 {
-    type Output = f32;
+    type Output = f64;
     fn index(&self, idx: usize) -> &Self::Output {
        &self.inner[idx]
     }
 }
 
 impl Index<(usize, usize)> for Matrix3x3 {
-    type Output = f32;
+    type Output = f64;
     fn index(&self, idx: (usize, usize)) -> &Self::Output {
         if idx.0 > 2 {
             panic!("index out of bounds: the width is 3, but the width index is {}", idx.0);
@@ -134,12 +134,12 @@ impl Index<(usize, usize)> for Matrix3x3 {
 
 /// An iterator over the values in a matrix in column-major order
 pub struct MatrixIter<'a> {
-    values: Vec<&'a f32>,
+    values: Vec<&'a f64>,
     index: usize,
 }
 
 impl<'a> Iterator for MatrixIter<'a> {
-    type Item = &'a f32;
+    type Item = &'a f64;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.values.len() {
             self.index += 1;
@@ -151,7 +151,7 @@ impl<'a> Iterator for MatrixIter<'a> {
 }
 
 impl<'a> IntoIterator for &'a Matrix3x3 {
-    type Item = &'a f32;
+    type Item = &'a f64;
     type IntoIter = MatrixIter<'a>;
     fn into_iter(self) -> Self::IntoIter {
         MatrixIter {
@@ -162,7 +162,7 @@ impl<'a> IntoIterator for &'a Matrix3x3 {
 }
 
 impl <'a> IntoIterator for &'a Matrix3x1 {
-    type Item = &'a f32;
+    type Item = &'a f64;
     type IntoIter = MatrixIter<'a>;
     fn into_iter(self) -> Self::IntoIter {
         MatrixIter {
@@ -187,8 +187,8 @@ fn matrix_iter() {
     assert_eq!(iter.next(), None);
 }
 
-impl AlmostEq<Self, f32> for Matrix3x3 {
-    const TOLERANCE: f32 = f32::TOLERANCE;
+impl AlmostEq<Self, f64> for Matrix3x3 {
+    const TOLERANCE: f64 = f64::TOLERANCE;
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.into_iter()
             .zip(rhs.into_iter())
@@ -196,8 +196,8 @@ impl AlmostEq<Self, f32> for Matrix3x3 {
     }
 }
 
-impl AlmostEq<Self, f32> for Matrix3x1 {
-    const TOLERANCE: f32 = f32::TOLERANCE;
+impl AlmostEq<Self, f64> for Matrix3x1 {
+    const TOLERANCE: f64 = f64::TOLERANCE;
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.into_iter()
             .zip(rhs.into_iter())
@@ -266,20 +266,20 @@ index_panics!(index_panic_3_3, (3,3));
 /// A 3x1 Matrix for color conversion calculations
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Matrix3x1 {
-    inner: [f32; 3],
+    inner: [f64; 3],
 }
 
 impl Matrix3x1 {
     /// Construct a new Matrix3x1 from 3 floats
-    pub const fn new(x: f32, y: f32, z: f32) -> Self {
+    pub const fn new(x: f64, y: f64, z: f64) -> Self {
         Matrix3x1 {
             inner: [x, y, z]
         }
     }
 }
 
-impl From<&[f32; 3]> for Matrix3x1 {
-    fn from(slice: &[f32; 3]) -> Self {
+impl From<&[f64; 3]> for Matrix3x1 {
+    fn from(slice: &[f64; 3]) -> Self {
         Matrix3x1::new(slice[0], slice[1], slice[2])
     }
 }
@@ -329,7 +329,7 @@ impl From<Matrix3x1> for XyzValue {
 }
 
 impl Index<usize> for Matrix3x1 {
-    type Output = f32;
+    type Output = f64;
     fn index(&self, idx: usize) -> &Self::Output {
         &self.inner[idx]
     }
@@ -405,7 +405,7 @@ impl RgbNominalValue {
     }
 }
 
-fn compand_srgb_inv(val: f32) -> f32 {
+fn compand_srgb_inv(val: f64) -> f64 {
     if val <= 0.04045 {
         val / 12.92
     } else {
@@ -413,7 +413,7 @@ fn compand_srgb_inv(val: f32) -> f32 {
     }
 }
 
-fn compand_srgb(val: f32) -> f32 {
+fn compand_srgb(val: f64) -> f64 {
     if val <= 0.0031308 {
         val * 12.92
     } else {
@@ -429,9 +429,9 @@ pub trait Pow<T> {
     fn pow(self, power: T) -> Self::Output;
 }
 
-impl Pow<f32> for Matrix3x3 {
+impl Pow<f64> for Matrix3x3 {
     type Output = Self;
-    fn pow(self, power: f32) -> Self::Output {
+    fn pow(self, power: f64) -> Self::Output {
         matrix3x3![
             self[0].powf(power), self[3].powf(power), self[6].powf(power);
             self[1].powf(power), self[4].powf(power), self[7].powf(power);
@@ -440,9 +440,9 @@ impl Pow<f32> for Matrix3x3 {
     }
 }
 
-impl Pow<f32> for Matrix3x1 {
+impl Pow<f64> for Matrix3x1 {
     type Output = Self;
-    fn pow(self, power: f32) -> Self::Output {
+    fn pow(self, power: f64) -> Self::Output {
         Matrix3x1::new(
             self[0].powf(power),
             self[1].powf(power),

@@ -1,5 +1,5 @@
 use crate::*;
-use illuminant::D50;
+use illuminant::*;
 pub use std::convert::TryFrom;
 
 // To Lab /////////////////////////////////////////////////////////////////////
@@ -51,9 +51,9 @@ impl From<RgbValue> for LabValue {
     }
 }
 
-impl TryFrom<&[f32; 3]> for LabValue {
+impl TryFrom<&[f64; 3]> for LabValue {
     type Error = ValueError;
-    fn try_from(slice: &[f32; 3]) -> ValueResult<LabValue> {
+    fn try_from(slice: &[f64; 3]) -> ValueResult<LabValue> {
         LabValue {
             l: slice[0],
             a: slice[1],
@@ -62,9 +62,9 @@ impl TryFrom<&[f32; 3]> for LabValue {
     }
 }
 
-impl TryFrom<(f32, f32, f32)> for LabValue {
+impl TryFrom<(f64, f64, f64)> for LabValue {
     type Error = ValueError;
-    fn try_from(tuple: (f32, f32, f32)) -> ValueResult<LabValue> {
+    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<LabValue> {
         LabValue {
             l: tuple.0,
             a: tuple.1,
@@ -73,9 +73,9 @@ impl TryFrom<(f32, f32, f32)> for LabValue {
     }
 }
 
-impl TryFrom<&(f32, f32, f32)> for LabValue {
+impl TryFrom<&(f64, f64, f64)> for LabValue {
     type Error = ValueError;
-    fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<LabValue> {
+    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<LabValue> {
         LabValue {
             l: tuple.0,
             a: tuple.1,
@@ -119,9 +119,9 @@ impl From<&XyzValue> for LchValue {
     }
 }
 
-impl TryFrom<&[f32; 3]> for LchValue {
+impl TryFrom<&[f64; 3]> for LchValue {
     type Error = ValueError;
-    fn try_from(slice: &[f32; 3]) -> ValueResult<LchValue> {
+    fn try_from(slice: &[f64; 3]) -> ValueResult<LchValue> {
         LchValue {
             l: slice[0],
             c: slice[1],
@@ -130,9 +130,9 @@ impl TryFrom<&[f32; 3]> for LchValue {
     }
 }
 
-impl TryFrom<(f32, f32, f32)> for LchValue {
+impl TryFrom<(f64, f64, f64)> for LchValue {
     type Error = ValueError;
-    fn try_from(tuple: (f32, f32, f32)) -> ValueResult<LchValue> {
+    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<LchValue> {
         LchValue {
             l: tuple.0,
             c: tuple.1,
@@ -141,9 +141,9 @@ impl TryFrom<(f32, f32, f32)> for LchValue {
     }
 }
 
-impl TryFrom<&(f32, f32, f32)> for LchValue {
+impl TryFrom<&(f64, f64, f64)> for LchValue {
     type Error = ValueError;
-    fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<LchValue> {
+    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<LchValue> {
         LchValue {
             l: tuple.0,
             c: tuple.1,
@@ -153,8 +153,8 @@ impl TryFrom<&(f32, f32, f32)> for LchValue {
 }
 
 // To Xyz /////////////////////////////////////////////////////////////////////
-impl From<LabValue> for XyzValue {
-    fn from(lab: LabValue) -> XyzValue {
+impl From<LabValue> for XyzRefValue {
+    fn from(lab: LabValue) -> XyzRefValue {
         let fy = (lab.l + 16.0) / 116.0;
         let fx = (lab.a / 500.0) + fy;
         let fz = fy - (lab.b / 200.0);
@@ -174,23 +174,34 @@ impl From<LabValue> for XyzValue {
             ((fz * 116.0) - 16.0) / KAPPA
         };
 
-        XyzValue {
-            x: xr * D50[0],
-            y: yr * D50[1],
-            z: zr * D50[2],
-        }
+        let white = Illuminant::D50;
+        let white_xyz = white.xyz();
+
+        let xyz = XyzValue {
+            x: xr * white_xyz.x,
+            y: yr * white_xyz.y,
+            z: zr * white_xyz.z,
+        };
+
+        XyzRefValue::new(xyz, white)
     }
 }
 
-impl From<&XyzValue> for XyzValue {
-    fn from(xyz: &XyzValue) -> XyzValue {
-        XyzValue::from(*xyz)
+impl From<LabValue> for XyzValue {
+    fn from(lab: LabValue) -> Self {
+        XyzRefValue::from(lab).xyz().clone()
     }
 }
 
 impl From<&LabValue> for XyzValue {
     fn from(lab: &LabValue) -> XyzValue {
         XyzValue::from(*lab)
+    }
+}
+
+impl From<&XyzValue> for XyzValue {
+    fn from(xyz: &XyzValue) -> XyzValue {
+        XyzValue::from(*xyz)
     }
 }
 
@@ -218,9 +229,9 @@ impl From<&RgbValue> for XyzValue {
     }
 }
 
-impl TryFrom<&[f32; 3]> for XyzValue {
+impl TryFrom<&[f64; 3]> for XyzValue {
     type Error = ValueError;
-    fn try_from(slice: &[f32; 3]) -> ValueResult<XyzValue> {
+    fn try_from(slice: &[f64; 3]) -> ValueResult<XyzValue> {
         XyzValue {
             x: slice[0],
             y: slice[1],
@@ -229,9 +240,9 @@ impl TryFrom<&[f32; 3]> for XyzValue {
     }
 }
 
-impl TryFrom<(f32, f32, f32)> for XyzValue {
+impl TryFrom<(f64, f64, f64)> for XyzValue {
     type Error = ValueError;
-    fn try_from(tuple: (f32, f32, f32)) -> ValueResult<XyzValue> {
+    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<XyzValue> {
         XyzValue {
             x: tuple.0,
             y: tuple.1,
@@ -240,9 +251,9 @@ impl TryFrom<(f32, f32, f32)> for XyzValue {
     }
 }
 
-impl TryFrom<&(f32, f32, f32)> for XyzValue {
+impl TryFrom<&(f64, f64, f64)> for XyzValue {
     type Error = ValueError;
-    fn try_from(tuple: &(f32, f32, f32)) -> ValueResult<XyzValue> {
+    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<XyzValue> {
         XyzValue {
             x: tuple.0,
             y: tuple.1,
@@ -265,11 +276,11 @@ impl From<&LabValue> for RgbValue {
 }
 
 // Helper Functions ////////////////////////////////////////////////////////////
-const KAPPA: f32 = 24389.0 / 27.0; // CIE Standard: 903.3
-const EPSILON: f32 = 216.0 / 24389.0; // CIE Standard: 0.008856
-const CBRT_EPSILON: f32 = 0.20689655172413796;
+const KAPPA: f64 = 24389.0 / 27.0; // CIE Standard: 903.3
+const EPSILON: f64 = 216.0 / 24389.0; // CIE Standard: 0.008856
+const CBRT_EPSILON: f64 = 0.20689655172413796;
 
-pub(crate) fn get_h_prime(a: f32, b: f32) -> f32 {
+pub(crate) fn get_h_prime(a: f64, b: f64) -> f64 {
     let h_prime = b.atan2(a).to_degrees();
     if h_prime < 0.0 {
         h_prime + 360.0
@@ -279,7 +290,7 @@ pub(crate) fn get_h_prime(a: f32, b: f32) -> f32 {
 }
 
 #[inline]
-fn xyz_to_lab_map(c: f32) -> f32 {
+fn xyz_to_lab_map(c: f64) -> f64 {
     if c > EPSILON {
         c.powf(1.0/3.0)
     } else {

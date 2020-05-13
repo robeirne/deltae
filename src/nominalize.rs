@@ -8,11 +8,11 @@ use crate::*;
 #[derive(Debug, Clone, PartialEq)]
 pub struct RgbNominalValue {
     /// Red
-    pub r: f32,
+    pub r: f64,
     /// Green
-    pub g: f32,
+    pub g: f64,
     /// Blue
-    pub b: f32,
+    pub b: f64,
 }
 
 impl Default for RgbNominalValue {
@@ -45,9 +45,9 @@ impl Nominalize for RgbValue {
     type Output = RgbNominalValue;
     fn nominalize(&self) -> Self::Output {
         RgbNominalValue {
-            r: self.r as f32 / 255.0,
-            g: self.g as f32 / 255.0,
-            b: self.b as f32 / 255.0,
+            r: self.r as f64 / 255.0,
+            g: self.g as f64 / 255.0,
+            b: self.b as f64 / 255.0,
         }
     }
 
@@ -62,8 +62,7 @@ fn nominalize_rgb() {
         g: 0.5019608,
         b: 1.0,
     };
-    assert_eq!(nom, exp);
-    assert_eq!(RgbValue::default().nominalize().r, 0.0);
+    assert_almost_eq!(nom, exp);
 }
 
 /// A trait to denominalize values from a 0 to 1 scale to something else
@@ -112,7 +111,7 @@ impl Clamp for RgbNominalValue {
     }
 }
 
-fn clamp(val: f32, low: f32, high: f32) -> f32 {
+fn clamp(val: f64, low: f64, high: f64) -> f64 {
     if val < low {
         low
     } else if val > high {

@@ -6,9 +6,9 @@ pub trait Round {
     fn round_to(self, places: i32) -> Self;
 }
 
-// Round an f32 to a number of decimal places
-fn round_to(val: f32, places: i32) -> f32 {
-    let mult = 10_f32.powi(places);
+// Round an f64 to a number of decimal places
+fn round_to(val: f64, places: i32) -> f64 {
+    let mult = 10_f64.powi(places);
     (val * mult).round() / mult
 }
 

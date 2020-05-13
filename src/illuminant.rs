@@ -59,7 +59,7 @@ pub enum Illuminant {
 
 impl Illuminant {
     /// Get the `XyzValue` of the `Illuminant` type
-    pub fn white_point(self) -> XyzValue {
+    pub fn xyz(self) -> XyzValue {
         Matrix3x1::from(self).into()
     }
 
@@ -67,6 +67,13 @@ impl Illuminant {
     /// chromatic adaptation matrix
     pub fn cone_response_domain(&self, method_matrix: Matrix3x3) -> ConeResponseDomain {
         (method_matrix * Matrix3x1::from(*self)).into()
+    }
+
+    /// Create a custom Illuminant
+    pub fn other(x: f64, y: f64, z: f64) -> Self {
+        Illuminant::Other(
+            matrix3x1![x; y; z;]
+        )
     }
 }
 

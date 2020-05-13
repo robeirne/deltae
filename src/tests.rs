@@ -135,7 +135,7 @@ fn xyz_string() {
     }
 }
 
-fn compare_de(method: DEMethod, expected: f32, reference: &[f32; 3], sample: &[f32; 3]) -> ValueResult<()> {
+fn compare_de(method: DEMethod, expected: f64, reference: &[f64; 3], sample: &[f64; 3]) -> ValueResult<()> {
     let lab0 = LabValue::try_from(reference)?;
     let lab1 = LabValue::try_from(sample)?;
 

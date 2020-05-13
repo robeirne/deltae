@@ -10,7 +10,7 @@ pub trait Delta where Self: Into<LabValue> {
     /// let lch = LchValue::new(60.3, 89.2, 270.0).unwrap();
     /// let xyz = XyzValue::new(0.347, 0.912, 0.446).unwrap();
     /// let de  = lch.delta(xyz, DE1976);
-    /// assert_eq!(de, 180.19023);
+    /// assert_almost_eq!(de.value(), 180.19025);
     /// ```
     fn delta<L: Into<LabValue>>(self, other: L, method: DEMethod) -> DeltaE {
         let lab0: LabValue = self.into();
@@ -31,13 +31,13 @@ impl<T: Into<LabValue>> Delta for T {}
 
 /// DeltaE 1976. Basic euclidian distance formula.
 #[inline]
-fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
+fn delta_e_1976(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     ( (lab_0.l - lab_1.l).powi(2) + (lab_0.a - lab_1.a).powi(2) + (lab_0.b - lab_1.b).powi(2) ).sqrt()
 }
 
 /// DeltaE 1994. Weighted for textiles (`true`) or graphics (`false`)
 #[inline]
-fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
+fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f64 {
     let delta_l = lab_0.l - lab_1.l;
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
@@ -63,13 +63,13 @@ fn delta_e_1994(lab_0: &LabValue, lab_1: &LabValue, textiles: bool) -> f32 {
 
 /// DeltaE 2000. This is a ridiculously complicated formula.
 #[inline]
-fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
+fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f64 {
     let chroma_0 = (lab_0.a.powi(2) + lab_0.b.powi(2)).sqrt();
     let chroma_1 = (lab_1.a.powi(2) + lab_1.b.powi(2)).sqrt();
 
     let c_bar = (chroma_0 + chroma_1) / 2.0;
 
-    let g = 0.5 * (1.0 - ( c_bar.powi(7) / (c_bar.powi(7) + 25_f32.powi(7)) ).sqrt());
+    let g = 0.5 * (1.0 - ( c_bar.powi(7) / (c_bar.powi(7) + 25_f64.powi(7)) ).sqrt());
 
     let a_prime_0 = lab_0.a * (1.0 + g);
     let a_prime_1 = lab_1.a * (1.0 + g);
@@ -117,7 +117,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
     let s_h = 1.0 + 0.015 * c_bar_prime * t;
 
     let delta_theta = 30.0 * (-((h_bar_prime - 275.0)/25.0).powi(2)).exp();
-    let r_c =  2.0 * (c_bar_prime.powi(7)/(c_bar_prime.powi(7) + 25_f32.powi(7))).sqrt();
+    let r_c =  2.0 * (c_bar_prime.powi(7)/(c_bar_prime.powi(7) + 25_f64.powi(7))).sqrt();
     let r_t = -(r_c * (2.0 * delta_theta.to_radians()).sin());
 
     let k_l = 1.0;
@@ -136,7 +136,7 @@ fn delta_e_2000(lab_0: &LabValue, lab_1: &LabValue) -> f32 {
 
 /// Custom weighted DeltaE formula
 #[inline]
-fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f32, tolerance_c: f32) -> f32 {
+fn delta_e_cmc(lab0: &LabValue, lab1 :&LabValue, tolerance_l: f64, tolerance_c: f64) -> f64 {
     let chroma_0 = (lab0.a.powi(2) + lab0.b.powi(2)).sqrt();
     let chroma_1 = (lab1.a.powi(2) + lab1.b.powi(2)).sqrt();
     let delta_c = chroma_0 - chroma_1;

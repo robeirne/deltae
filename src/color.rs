@@ -34,6 +34,7 @@ use crate::{
     ValueResult,
     rgb,
     validate::Validate,
+    illuminant::*,
 };
 
 /// # CIEL\*a\*b\*
@@ -47,17 +48,17 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LabValue {
     /// Lightness
-    pub l: f32,
+    pub l: f64,
     /// Green - Magenta
-    pub a: f32,
+    pub a: f64,
     /// Blue - Yellow
-    pub b: f32,
+    pub b: f64,
 }
 
 impl LabValue {
-    /// Returns a result of a LabValue from 3 `f32`s.
+    /// Returns a result of a LabValue from 3 `f64`s.
     /// Will return `Err()` if the values are out of range
-    pub fn new(l: f32, a: f32, b: f32) -> ValueResult<LabValue> {
+    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<LabValue> {
         LabValue {l, a, b}.validate()
     }
 }
@@ -92,22 +93,22 @@ impl fmt::Display for LabValue {
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct LchValue {
     /// Lightness
-    pub l: f32,
+    pub l: f64,
     /// Chroma
-    pub c: f32,
+    pub c: f64,
     /// Hue (in degrees)
-    pub h: f32,
+    pub h: f64,
 }
 
 impl LchValue {
-    /// Returns a result of an LchValue from 3 `f32`s.
+    /// Returns a result of an LchValue from 3 `f64`s.
     /// Will return `Err()` if the values are out of range
-    pub fn new(l: f32, c: f32, h: f32) -> ValueResult<LchValue> {
+    pub fn new(l: f64, c: f64, h: f64) -> ValueResult<LchValue> {
         LchValue { l, c, h }.validate()
     }
 
     /// Returns the Hue as radians rather than degrees
-    pub fn hue_radians(&self) -> f32 {
+    pub fn hue_radians(&self) -> f64 {
         self.h.to_radians()
     }
 }
@@ -142,17 +143,17 @@ impl fmt::Display for LchValue {
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct XyzValue {
     /// X Value
-    pub x: f32,
+    pub x: f64,
     /// Y Value
-    pub y: f32,
+    pub y: f64,
     /// Z Value
-    pub z: f32,
+    pub z: f64,
 }
 
 impl XyzValue {
-    /// Returns a result of an XyzValue from 3 `f32`s.
+    /// Returns a result of an XyzValue from 3 `f64`s.
     /// Will return `Err()` if the values are out of range
-    pub fn new(x: f32, y: f32, z:f32) -> ValueResult<XyzValue> {
+    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<XyzValue> {
         XyzValue {x, y, z}.validate()
     }
 
@@ -179,6 +180,30 @@ impl fmt::Display for XyzValue {
         } else {
             write!(f, "[X:{}, Y:{}, Z:{}]", self.x, self.y, self.z)
         }
+    }
+}
+
+/// An XyzValue with a reference white point. A white point is required for valid color
+/// conversions
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct XyzRefValue {
+    /// XyzValue
+    xyz: XyzValue,
+    /// Reference white point
+    white: Illuminant,
+}
+
+impl XyzRefValue {
+    pub fn new(xyz: XyzValue, white: Illuminant) -> Self {
+        XyzRefValue { xyz, white }
+    }
+
+    pub fn xyz(&self) -> &XyzValue {
+        &self.xyz
+    }
+
+    pub fn white(&self) -> &Illuminant {
+        &self.white
     }
 }
 

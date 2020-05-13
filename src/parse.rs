@@ -22,7 +22,7 @@ impl FromStr for DEMethod {
 impl FromStr for LabValue {
     type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<LabValue> {
-        let split = parse_str_to_vecf32(s, 3)?;
+        let split = parse_str_to_vecf64(s, 3)?;
 
         LabValue {
             l: split[0],
@@ -35,7 +35,7 @@ impl FromStr for LabValue {
 impl FromStr for LchValue {
     type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<LchValue> {
-        let split = parse_str_to_vecf32(s, 3)?;
+        let split = parse_str_to_vecf64(s, 3)?;
 
         LchValue {
             l: split[0],
@@ -48,7 +48,7 @@ impl FromStr for LchValue {
 impl FromStr for XyzValue {
     type Err = ValueError;
     fn from_str(s: &str) -> ValueResult<XyzValue> {
-        let split = parse_str_to_vecf32(s, 3)?;
+        let split = parse_str_to_vecf64(s, 3)?;
 
         XyzValue {
             x: split[0],
@@ -61,7 +61,7 @@ impl FromStr for XyzValue {
 
 // Validate and convert strings to `LabValue`.
 // Split string by comma (92.5,33.5,-18.8).
-fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
+fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
     let collection: Vec<&str> = s.split(",").collect();
 
     // Allow extraneous whitespace ("92.5, 33.5, -18.8")
@@ -71,8 +71,8 @@ fn parse_str_to_vecf32(s: &str, length: usize) -> ValueResult<Vec<f32>> {
             v.push(item.trim());
         }
     }
-    // Parse the f32's into a Vec
-    let split: Vec<f32> = v.iter().filter_map(|s| s.parse().ok()).collect();
+    // Parse the f64's into a Vec
+    let split: Vec<f64> = v.iter().filter_map(|s| s.parse().ok()).collect();
 
     // Check if it's the right number of items
     if v.len() != length || split.len() != length {

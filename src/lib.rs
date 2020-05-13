@@ -96,7 +96,7 @@ pub struct DeltaE {
     /// The mathematical method used for calculating color difference
     method: DEMethod,
     /// The calculated value
-    value: f32,
+    value: f64,
 }
 
 impl DeltaE {
@@ -112,7 +112,7 @@ impl DeltaE {
     }
 
     /// Gets the numerical value of the `DeltaE`
-    pub fn value(&self) -> &f32 {
+    pub fn value(&self) -> &f64 {
         &self.value
     }
 }
@@ -150,8 +150,8 @@ fn deltae_display() {
     );
 }
 
-impl PartialEq<f32> for DeltaE {
-    fn eq(&self, f: &f32) -> bool {
+impl PartialEq<f64> for DeltaE {
+    fn eq(&self, f: &f64) -> bool {
         self.value == *f
     }
 }
@@ -170,7 +170,7 @@ pub enum DEMethod{
     /// The default DeltaE method
     DE2000,
     /// An implementation of DeltaE with tolerances for Lightness and Chroma
-    DECMC(f32, f32),
+    DECMC(f64, f64),
     /// CIE94 DeltaE implementation, weighted with a tolerance for graphics
     DE1994G,
     /// CIE94 DeltaE implementation, weighted with a tolerance for textiles

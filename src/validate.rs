@@ -22,7 +22,7 @@ impl Validate for LabValue {
 impl Validate for LchValue {
     fn validate(self) -> ValueResult<Self> {
         if self.l < 0.0 || self.l > 100.0 ||
-           self.c < 0.0 || self.c > (128_f32.powi(2) + 128_f32.powi(2)).sqrt() ||
+           self.c < 0.0 || self.c > (128_f64.powi(2) + 128_f64.powi(2)).sqrt() ||
            self.h < 0.0 || self.h > 360.0
         {
             Err(ValueError::out_of_bounds(self))
