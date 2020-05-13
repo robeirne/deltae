@@ -19,8 +19,8 @@ impl Round for DeltaE {
     }
 }
 
-impl Round for LabValue {
-    fn round_to(mut self, places: i32) -> LabValue {
+impl Round for CieLabValue {
+    fn round_to(mut self, places: i32) -> CieLabValue {
         self.l = round_to(self.l, places);
         self.a = round_to(self.a, places);
         self.b = round_to(self.b, places);
@@ -37,8 +37,8 @@ impl Round for LchValue {
     }
 }
 
-impl Round for XyzValue {
-    fn round_to(mut self, places: i32) -> XyzValue {
+impl Round for CieXyzValue {
+    fn round_to(mut self, places: i32) -> CieXyzValue {
         self.x = round_to(self.x, places);
         self.y = round_to(self.y, places);
         self.z = round_to(self.z, places);

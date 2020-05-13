@@ -19,12 +19,12 @@ impl FromStr for DEMethod {
     }
 }
 
-impl FromStr for LabValue {
+impl FromStr for CieLabValue {
     type Err = ValueError;
-    fn from_str(s: &str) -> ValueResult<LabValue> {
+    fn from_str(s: &str) -> ValueResult<CieLabValue> {
         let split = parse_str_to_vecf64(s, 3)?;
 
-        LabValue {
+        CieLabValue {
             l: split[0],
             a: split[1],
             b: split[2],
@@ -45,12 +45,12 @@ impl FromStr for LchValue {
     }
 }
 
-impl FromStr for XyzValue {
+impl FromStr for CieXyzValue {
     type Err = ValueError;
-    fn from_str(s: &str) -> ValueResult<XyzValue> {
+    fn from_str(s: &str) -> ValueResult<CieXyzValue> {
         let split = parse_str_to_vecf64(s, 3)?;
 
-        XyzValue {
+        CieXyzValue {
             x: split[0],
             y: split[1],
             z: split[2],
@@ -59,7 +59,7 @@ impl FromStr for XyzValue {
 
 }
 
-// Validate and convert strings to `LabValue`.
+// Validate and convert strings to `CieLabValue`.
 // Split string by comma (92.5,33.5,-18.8).
 fn parse_str_to_vecf64(s: &str, length: usize) -> ValueResult<Vec<f64>> {
     let collection: Vec<&str> = s.split(",").collect();

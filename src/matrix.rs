@@ -284,8 +284,8 @@ impl From<&[f64; 3]> for Matrix3x1 {
     }
 }
 
-impl From<XyzValue> for Matrix3x1 {
-    fn from(xyz: XyzValue) -> Self {
+impl From<CieXyzValue> for Matrix3x1 {
+    fn from(xyz: CieXyzValue) -> Self {
         Matrix3x1::new(xyz.x, xyz.y, xyz.z)
     }
 }
@@ -318,9 +318,9 @@ impl From<Matrix3x1> for RgbNominalValue {
     }
 }
 
-impl From<Matrix3x1> for XyzValue {
+impl From<Matrix3x1> for CieXyzValue {
     fn from(matrix: Matrix3x1) -> Self {
-        XyzValue {
+        CieXyzValue {
             x: matrix[0],
             y: matrix[1],
             z: matrix[2],

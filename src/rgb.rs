@@ -60,7 +60,7 @@ impl RgbSystemValue {
     }
 }
 
-pub(crate) fn xyz_to_rgb(xyz: XyzValue, rgb_system: RgbSystem) -> RgbValue {
+pub(crate) fn xyz_to_rgb(xyz: CieXyzValue, rgb_system: RgbSystem) -> RgbValue {
     let matrix = match rgb_system {
         RgbSystem::Adobe1998 => ADOBERGB_1998_D65_XYZ2RGB,
         RgbSystem::Apple => APPLERGB_D65_XYZ2RGB,
@@ -82,7 +82,7 @@ pub(crate) fn xyz_to_rgb(xyz: XyzValue, rgb_system: RgbSystem) -> RgbValue {
     (matrix * Matrix3x1::from(xyz)).into()
 }
 
-pub(crate) fn rgb_to_xyz(rgb: RgbValue, rgb_system: RgbSystem) -> XyzValue {
+pub(crate) fn rgb_to_xyz(rgb: RgbValue, rgb_system: RgbSystem) -> CieXyzValue {
     let matrix = match rgb_system {
         RgbSystem::Adobe1998 => ADOBERGB_1998_D65_RGB2XYZ,
         RgbSystem::Apple => APPLERGB_D65_RGB2XYZ,
@@ -109,10 +109,10 @@ fn convert_rgb() {
     use chromatic_adaptation::*;
     use illuminant::*;
 
-    let xyz = XyzValue::new(0.208137, 0.215861, 0.178130).unwrap();
-    let lab = LabValue::from(xyz);
+    let xyz = CieXyzValue::new(0.208137, 0.215861, 0.178130).unwrap();
+    let lab = CieLabValue::from(xyz);
     dbg!(lab);
-    let exp = LabValue::new(53.5850, 0.0, 0.0).unwrap();
+    let exp = CieLabValue::new(53.5850, 0.0, 0.0).unwrap();
     //assert_almost_eq!(lab, exp);
 
     dbg!(xyz.chrom_adapt(Bradford, Illuminant::D50, Illuminant::D65));

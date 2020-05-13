@@ -3,9 +3,9 @@ use illuminant::*;
 pub use std::convert::TryFrom;
 
 // To Lab /////////////////////////////////////////////////////////////////////
-impl From<LchValue> for LabValue {
-    fn from(lch: LchValue) -> LabValue {
-        LabValue {
+impl From<LchValue> for CieLabValue {
+    fn from(lch: LchValue) -> CieLabValue {
+        CieLabValue {
             l: lch.l,
             a: lch.c * lch.h.to_radians().cos(),
             b: lch.c * lch.h.to_radians().sin(),
@@ -13,25 +13,25 @@ impl From<LchValue> for LabValue {
     }
 }
 
-impl From<&LchValue> for LabValue {
-    fn from(lch: &LchValue) -> LabValue {
-        LabValue::from(*lch)
+impl From<&LchValue> for CieLabValue {
+    fn from(lch: &LchValue) -> CieLabValue {
+        CieLabValue::from(*lch)
     }
 }
 
-impl From<&LabValue> for LabValue {
-    fn from(lab: &LabValue) -> LabValue {
+impl From<&CieLabValue> for CieLabValue {
+    fn from(lab: &CieLabValue) -> CieLabValue {
         *lab
     }
 }
 
-impl From<XyzValue> for LabValue {
-    fn from(xyz: XyzValue) -> LabValue {
+impl From<CieXyzValue> for CieLabValue {
+    fn from(xyz: CieXyzValue) -> CieLabValue {
         let x = xyz_to_lab_map(xyz.x / D50[0]);
         let y = xyz_to_lab_map(xyz.y / D50[1]);
         let z = xyz_to_lab_map(xyz.z / D50[2]);
 
-        LabValue {
+        CieLabValue {
             l: (116.0 * y) - 16.0,
             a: 500.0 * (x - y),
             b: 200.0 * (y - z),
@@ -39,22 +39,22 @@ impl From<XyzValue> for LabValue {
     }
 }
 
-impl From<&XyzValue> for LabValue {
-    fn from(xyz: &XyzValue) -> LabValue {
-        LabValue::from(*xyz)
+impl From<&CieXyzValue> for CieLabValue {
+    fn from(xyz: &CieXyzValue) -> CieLabValue {
+        CieLabValue::from(*xyz)
     }
 }
 
-impl From<RgbValue> for LabValue {
-    fn from(rgb: RgbValue) -> LabValue {
-        LabValue::from(XyzValue::from(rgb))
+impl From<RgbValue> for CieLabValue {
+    fn from(rgb: RgbValue) -> CieLabValue {
+        CieLabValue::from(CieXyzValue::from(rgb))
     }
 }
 
-impl TryFrom<&[f64; 3]> for LabValue {
+impl TryFrom<&[f64; 3]> for CieLabValue {
     type Error = ValueError;
-    fn try_from(slice: &[f64; 3]) -> ValueResult<LabValue> {
-        LabValue {
+    fn try_from(slice: &[f64; 3]) -> ValueResult<CieLabValue> {
+        CieLabValue {
             l: slice[0],
             a: slice[1],
             b: slice[2]
@@ -62,10 +62,10 @@ impl TryFrom<&[f64; 3]> for LabValue {
     }
 }
 
-impl TryFrom<(f64, f64, f64)> for LabValue {
+impl TryFrom<(f64, f64, f64)> for CieLabValue {
     type Error = ValueError;
-    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<LabValue> {
-        LabValue {
+    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<CieLabValue> {
+        CieLabValue {
             l: tuple.0,
             a: tuple.1,
             b: tuple.2,
@@ -73,10 +73,10 @@ impl TryFrom<(f64, f64, f64)> for LabValue {
     }
 }
 
-impl TryFrom<&(f64, f64, f64)> for LabValue {
+impl TryFrom<&(f64, f64, f64)> for CieLabValue {
     type Error = ValueError;
-    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<LabValue> {
-        LabValue {
+    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<CieLabValue> {
+        CieLabValue {
             l: tuple.0,
             a: tuple.1,
             b: tuple.2,
@@ -91,8 +91,8 @@ impl From<&LchValue> for LchValue {
     }
 }
 
-impl From<LabValue> for LchValue {
-    fn from(lab: LabValue) -> LchValue {
+impl From<CieLabValue> for LchValue {
+    fn from(lab: CieLabValue) -> LchValue {
         LchValue {
             l: lab.l,
             c: ( lab.a.powi(2) + lab.b.powi(2) ).sqrt(),
@@ -101,20 +101,20 @@ impl From<LabValue> for LchValue {
     }
 }
 
-impl From<&LabValue> for LchValue {
-    fn from(lab: &LabValue) -> LchValue {
+impl From<&CieLabValue> for LchValue {
+    fn from(lab: &CieLabValue) -> LchValue {
         LchValue::from(*lab)
     }
 }
 
-impl From<XyzValue> for LchValue {
-    fn from(xyz: XyzValue) -> LchValue {
-        LchValue::from(LabValue::from(xyz))
+impl From<CieXyzValue> for LchValue {
+    fn from(xyz: CieXyzValue) -> LchValue {
+        LchValue::from(CieLabValue::from(xyz))
     }
 }
 
-impl From<&XyzValue> for LchValue {
-    fn from(xyz: &XyzValue) -> LchValue {
+impl From<&CieXyzValue> for LchValue {
+    fn from(xyz: &CieXyzValue) -> LchValue {
         LchValue::from(*xyz)
     }
 }
@@ -153,8 +153,8 @@ impl TryFrom<&(f64, f64, f64)> for LchValue {
 }
 
 // To Xyz /////////////////////////////////////////////////////////////////////
-impl From<LabValue> for XyzRefValue {
-    fn from(lab: LabValue) -> XyzRefValue {
+impl From<CieLabValue> for XyzRefValue {
+    fn from(lab: CieLabValue) -> XyzRefValue {
         let fy = (lab.l + 16.0) / 116.0;
         let fx = (lab.a / 500.0) + fy;
         let fz = fy - (lab.b / 200.0);
@@ -177,7 +177,7 @@ impl From<LabValue> for XyzRefValue {
         let white = Illuminant::D50;
         let white_xyz = white.xyz();
 
-        let xyz = XyzValue {
+        let xyz = CieXyzValue {
             x: xr * white_xyz.x,
             y: yr * white_xyz.y,
             z: zr * white_xyz.z,
@@ -187,52 +187,52 @@ impl From<LabValue> for XyzRefValue {
     }
 }
 
-impl From<LabValue> for XyzValue {
-    fn from(lab: LabValue) -> Self {
+impl From<CieLabValue> for CieXyzValue {
+    fn from(lab: CieLabValue) -> Self {
         XyzRefValue::from(lab).xyz().clone()
     }
 }
 
-impl From<&LabValue> for XyzValue {
-    fn from(lab: &LabValue) -> XyzValue {
-        XyzValue::from(*lab)
+impl From<&CieLabValue> for CieXyzValue {
+    fn from(lab: &CieLabValue) -> CieXyzValue {
+        CieXyzValue::from(*lab)
     }
 }
 
-impl From<&XyzValue> for XyzValue {
-    fn from(xyz: &XyzValue) -> XyzValue {
-        XyzValue::from(*xyz)
+impl From<&CieXyzValue> for CieXyzValue {
+    fn from(xyz: &CieXyzValue) -> CieXyzValue {
+        CieXyzValue::from(*xyz)
     }
 }
 
-impl From<LchValue> for XyzValue {
-    fn from(lch: LchValue) -> XyzValue {
-        XyzValue::from(LabValue::from(lch))
+impl From<LchValue> for CieXyzValue {
+    fn from(lch: LchValue) -> CieXyzValue {
+        CieXyzValue::from(CieLabValue::from(lch))
     }
 }
 
-impl From<&LchValue> for XyzValue {
-    fn from(lch: &LchValue) -> XyzValue {
-        XyzValue::from(*lch)
+impl From<&LchValue> for CieXyzValue {
+    fn from(lch: &LchValue) -> CieXyzValue {
+        CieXyzValue::from(*lch)
     }
 }
 
-impl From<RgbValue> for XyzValue {
-    fn from(rgb: RgbValue) -> XyzValue {
+impl From<RgbValue> for CieXyzValue {
+    fn from(rgb: RgbValue) -> CieXyzValue {
         rgb.to_xyz(rgb::RgbSystem::default())
     }
 }
 
-impl From<&RgbValue> for XyzValue {
-    fn from(rgb: &RgbValue) -> XyzValue {
-        XyzValue::from(*rgb)
+impl From<&RgbValue> for CieXyzValue {
+    fn from(rgb: &RgbValue) -> CieXyzValue {
+        CieXyzValue::from(*rgb)
     }
 }
 
-impl TryFrom<&[f64; 3]> for XyzValue {
+impl TryFrom<&[f64; 3]> for CieXyzValue {
     type Error = ValueError;
-    fn try_from(slice: &[f64; 3]) -> ValueResult<XyzValue> {
-        XyzValue {
+    fn try_from(slice: &[f64; 3]) -> ValueResult<CieXyzValue> {
+        CieXyzValue {
             x: slice[0],
             y: slice[1],
             z: slice[2]
@@ -240,10 +240,10 @@ impl TryFrom<&[f64; 3]> for XyzValue {
     }
 }
 
-impl TryFrom<(f64, f64, f64)> for XyzValue {
+impl TryFrom<(f64, f64, f64)> for CieXyzValue {
     type Error = ValueError;
-    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<XyzValue> {
-        XyzValue {
+    fn try_from(tuple: (f64, f64, f64)) -> ValueResult<CieXyzValue> {
+        CieXyzValue {
             x: tuple.0,
             y: tuple.1,
             z: tuple.2,
@@ -251,10 +251,10 @@ impl TryFrom<(f64, f64, f64)> for XyzValue {
     }
 }
 
-impl TryFrom<&(f64, f64, f64)> for XyzValue {
+impl TryFrom<&(f64, f64, f64)> for CieXyzValue {
     type Error = ValueError;
-    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<XyzValue> {
-        XyzValue {
+    fn try_from(tuple: &(f64, f64, f64)) -> ValueResult<CieXyzValue> {
+        CieXyzValue {
             x: tuple.0,
             y: tuple.1,
             z: tuple.2,
@@ -263,14 +263,14 @@ impl TryFrom<&(f64, f64, f64)> for XyzValue {
 }
 
 // To RGB //////////////////////////////////////////////////////////////////////
-impl From<LabValue> for RgbValue {
-    fn from(lab: LabValue) -> Self {
-        XyzValue::from(lab).to_rgb(rgb::RgbSystem::default())
+impl From<CieLabValue> for RgbValue {
+    fn from(lab: CieLabValue) -> Self {
+        CieXyzValue::from(lab).to_rgb(rgb::RgbSystem::default())
     }
 }
 
-impl From<&LabValue> for RgbValue {
-    fn from(lab: &LabValue) -> Self {
+impl From<&CieLabValue> for RgbValue {
+    fn from(lab: &CieLabValue) -> Self {
         RgbValue::from(*lab)
     }
 }

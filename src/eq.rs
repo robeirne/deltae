@@ -16,15 +16,15 @@ where
     /// # Example
     ///
     /// ```
-    /// use deltae::{LabValue, Tolerance, DeltaEq, DEMethod::DE2000};
+    /// use deltae::{CieLabValue, Tolerance, DeltaEq, DEMethod::DE2000};
     ///
-    /// let lab0 = LabValue::new(50.0, 20.0, 30.0).unwrap();
-    /// let lab1 = LabValue::new(50.1, 19.9, 30.2).unwrap();
+    /// let lab0 = CieLabValue::new(50.0, 20.0, 30.0).unwrap();
+    /// let lab1 = CieLabValue::new(50.1, 19.9, 30.2).unwrap();
     /// let tol = Tolerance::new(DE2000, 1.0);
     ///
     /// assert!(lab0.delta_eq(lab1, tol));
     ///
-    /// let lab2 = LabValue::new(55.0, 25.0, 35.0).unwrap();
+    /// let lab2 = CieLabValue::new(55.0, 25.0, 35.0).unwrap();
     /// assert!(!lab0.delta_eq(lab2, tol));
     /// ```
     ///
@@ -199,7 +199,7 @@ impl AlmostEq<Self, f64> for DeltaE {
     }
 }
 
-impl AlmostEq<Self, f64> for LabValue {
+impl AlmostEq<Self, f64> for CieLabValue {
     const TOLERANCE: f64 = f64::TOLERANCE;
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.l.almost_eq(&rhs.l)

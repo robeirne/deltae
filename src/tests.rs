@@ -1,18 +1,18 @@
 use super::*;
-use color::{LabValue, LchValue, XyzValue};
+use color::{CieLabValue, LchValue, CieXyzValue};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
 #[test]
 fn lab_to_lch() {
-    let lab = LabValue {
+    let lab = CieLabValue {
         l: 30.0,
         a: 40.0,
         b: 50.0,
     };
 
     let lch  = LchValue::from(lab);
-    let lab2 = LabValue::from(lch);
+    let lab2 = CieLabValue::from(lch);
     assert_eq!(lab.round_to(4), lab2.round_to(4));
 }
 
@@ -24,21 +24,21 @@ fn lch_to_lab() {
         h: 50.0,
     };
 
-    let lab  = LabValue::from(lch);
+    let lab  = CieLabValue::from(lch);
     let lch2 = LchValue::from(lab);
     assert_eq!(lch.round_to(4), lch2.round_to(4));
 }
 
 #[test]
 fn lab_to_xyz() {
-    let lab = LabValue {
+    let lab = CieLabValue {
         l: 30.0,
         a: 40.0,
         b: 50.0,
     };
 
-    let xyz  = XyzValue::from(lab);
-    let lab2 = LabValue::from(xyz);
+    let xyz  = CieXyzValue::from(lab);
+    let lab2 = CieLabValue::from(xyz);
     assert_eq!(lab.round_to(4), lab2.round_to(4));
 }
 
@@ -55,7 +55,7 @@ fn lab_string() {
     ];
 
     for i in good {
-        assert!(LabValue::from_str(i).is_ok());
+        assert!(CieLabValue::from_str(i).is_ok());
     }
 
     let bad = &[
@@ -72,7 +72,7 @@ fn lab_string() {
     ];
 
     for i in bad {
-        assert!(LabValue::from_str(i).is_err());
+        assert!(CieLabValue::from_str(i).is_err());
     }
 }
 
@@ -118,7 +118,7 @@ fn xyz_string() {
     ];
 
     for i in good {
-        assert!(XyzValue::from_str(i).is_ok());
+        assert!(CieXyzValue::from_str(i).is_ok());
     }
 
     let bad = &[
@@ -131,13 +131,13 @@ fn xyz_string() {
     ];
 
     for i in bad {
-        assert!(XyzValue::from_str(i).is_err());
+        assert!(CieXyzValue::from_str(i).is_err());
     }
 }
 
 fn compare_de(method: DEMethod, expected: f64, reference: &[f64; 3], sample: &[f64; 3]) -> ValueResult<()> {
-    let lab0 = LabValue::try_from(reference)?;
-    let lab1 = LabValue::try_from(sample)?;
+    let lab0 = CieLabValue::try_from(reference)?;
+    let lab1 = CieLabValue::try_from(sample)?;
 
     let de = lab0.delta(lab1, method).round_to(4).value;
 

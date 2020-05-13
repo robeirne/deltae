@@ -7,7 +7,7 @@
 //! use std::error::Error;
 //!
 //! fn main() -> Result<(), Box<dyn Error>> {
-//!     let lab0: LabValue = "95.08, -0.17, -10.81".parse()?;
+//!     let lab0: CieLabValue = "95.08, -0.17, -10.81".parse()?;
 //!     let lch0 = LchValue {
 //!         l: 95.08,
 //!         c: 10.811337,
@@ -17,7 +17,7 @@
 //!     assert!(lab0.delta_eq(lch0, &Tolerance::default()));
 //!
 //!     let lch0 = LchValue::from(lab0);
-//!     let lab2 = LabValue::from(lch0);
+//!     let lab2 = CieLabValue::from(lch0);
 //!
 //!     println!("{}", lch0); // [L:89.73, c:7.2094, h:285.1157]
 //!
@@ -46,7 +46,7 @@ use crate::{
 /// | `b*`    | `Blue  <---> Yellow`  | `-128 <---> 128` |
 ///
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub struct LabValue {
+pub struct CieLabValue {
     /// Lightness
     pub l: f64,
     /// Green - Magenta
@@ -55,21 +55,21 @@ pub struct LabValue {
     pub b: f64,
 }
 
-impl LabValue {
-    /// Returns a result of a LabValue from 3 `f64`s.
+impl CieLabValue {
+    /// Returns a result of a CieLabValue from 3 `f64`s.
     /// Will return `Err()` if the values are out of range
-    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<LabValue> {
-        LabValue {l, a, b}.validate()
+    pub fn new(l: f64, a: f64, b: f64) -> ValueResult<CieLabValue> {
+        CieLabValue {l, a, b}.validate()
     }
 }
 
-impl Default for LabValue {
-    fn default() -> LabValue {
-        LabValue { l: 0.0, a: 0.0, b: 0.0 }
+impl Default for CieLabValue {
+    fn default() -> CieLabValue {
+        CieLabValue { l: 0.0, a: 0.0, b: 0.0 }
     }
 }
 
-impl fmt::Display for LabValue {
+impl fmt::Display for CieLabValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(p) = f.precision() {
             write!(f,
@@ -141,7 +141,7 @@ impl fmt::Display for LchValue {
 /// | `Z`     | `Blue`  | `0 <---> 1` |
 ///
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
-pub struct XyzValue {
+pub struct CieXyzValue {
     /// X Value
     pub x: f64,
     /// Y Value
@@ -150,26 +150,26 @@ pub struct XyzValue {
     pub z: f64,
 }
 
-impl XyzValue {
-    /// Returns a result of an XyzValue from 3 `f64`s.
+impl CieXyzValue {
+    /// Returns a result of an CieXyzValue from 3 `f64`s.
     /// Will return `Err()` if the values are out of range
-    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<XyzValue> {
-        XyzValue {x, y, z}.validate()
+    pub fn new(x: f64, y: f64, z:f64) -> ValueResult<CieXyzValue> {
+        CieXyzValue {x, y, z}.validate()
     }
 
-    /// Convert an `XyzValue` to an `RgbValue` in a given `RgbSystem`
+    /// Convert an `CieXyzValue` to an `RgbValue` in a given `RgbSystem`
     pub fn to_rgb(&self, rgb_system: rgb::RgbSystem) -> RgbValue {
         rgb::xyz_to_rgb(*self, rgb_system)
     }
 }
 
-impl Default for XyzValue {
-    fn default() -> XyzValue {
-        XyzValue { x: 0.0, y: 0.0, z: 0.0 }
+impl Default for CieXyzValue {
+    fn default() -> CieXyzValue {
+        CieXyzValue { x: 0.0, y: 0.0, z: 0.0 }
     }
 }
 
-impl fmt::Display for XyzValue {
+impl fmt::Display for CieXyzValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if let Some(p) = f.precision() {
             write!(
@@ -183,22 +183,22 @@ impl fmt::Display for XyzValue {
     }
 }
 
-/// An XyzValue with a reference white point. A white point is required for valid color
+/// An CieXyzValue with a reference white point. A white point is required for valid color
 /// conversions
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct XyzRefValue {
-    /// XyzValue
-    xyz: XyzValue,
+    /// CieXyzValue
+    xyz: CieXyzValue,
     /// Reference white point
     white: Illuminant,
 }
 
 impl XyzRefValue {
-    pub fn new(xyz: XyzValue, white: Illuminant) -> Self {
+    pub fn new(xyz: CieXyzValue, white: Illuminant) -> Self {
         XyzRefValue { xyz, white }
     }
 
-    pub fn xyz(&self) -> &XyzValue {
+    pub fn xyz(&self) -> &CieXyzValue {
         &self.xyz
     }
 
@@ -231,8 +231,8 @@ impl RgbValue {
         RgbValue { r, g, b }
     }
 
-    /// Convert an `RgbValue` wit a given `RgbSystem` to an `XyzValue`
-    pub fn to_xyz(&self, rgb_system: rgb::RgbSystem) -> XyzValue {
+    /// Convert an `RgbValue` wit a given `RgbSystem` to an `CieXyzValue`
+    pub fn to_xyz(&self, rgb_system: rgb::RgbSystem) -> CieXyzValue {
         rgb::rgb_to_xyz(*self, rgb_system)
     }
 

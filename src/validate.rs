@@ -6,7 +6,7 @@ pub trait Validate where Self: Sized {
     fn validate(self) -> ValueResult<Self>;
 }
 
-impl Validate for LabValue {
+impl Validate for CieLabValue {
     fn validate(self) -> ValueResult<Self> {
         if self.l < 0.0    || self.l > 100.0 ||
            self.a < -128.0 || self.a > 128.0 ||
@@ -33,7 +33,7 @@ impl Validate for LchValue {
 }
 
 /// Not sure about the bounds on XYZ
-impl Validate for XyzValue {
+impl Validate for CieXyzValue {
     fn validate(self) -> ValueResult<Self> {
         if self.x < 0.0 || self.x > 1.0 ||
            self.y < 0.0 || self.y > 1.0 ||

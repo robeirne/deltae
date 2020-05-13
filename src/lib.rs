@@ -11,9 +11,9 @@
 //!
 //! fn main() -> Result<(), Box<dyn Error>>{
 //!     // Lab from a string
-//!     let lab0: LabValue = "89.73, 1.88, -6.96".parse()?;
+//!     let lab0: CieLabValue = "89.73, 1.88, -6.96".parse()?;
 //!     // Lab directly from values
-//!     let lab1 = LabValue {
+//!     let lab1 = CieLabValue {
 //!         l: 95.08,
 //!         a: -0.17,
 //!         b: -10.81,
@@ -27,7 +27,7 @@
 //!
 //!     // Convert to other color types
 //!     let lch0 = LchValue::from(lab0);
-//!     let xyz0 = XyzValue::from(lab1);
+//!     let xyz0 = CieXyzValue::from(lab1);
 //!     assert!(lch0.delta_eq(lab0, Tolerance::default()));
 //!     let de2 = xyz0.delta(lab1, DE2000);
 //!     dbg!(de2);

@@ -1,7 +1,7 @@
 //! Standard Illuminants for Chromatic Adaptation.
 //! See also: [BruceLindbloom.com](http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html)
 
-use crate::{XyzValue, matrix::*, matrix3x1, chromatic_adaptation::*};
+use crate::{CieXyzValue, matrix::*, matrix3x1, chromatic_adaptation::*};
 
 /// Tungsten-filament (incandescent)
 pub const A:   Matrix3x1 = matrix3x1![1.09850; 1.00000; 0.35585;];
@@ -58,8 +58,8 @@ pub enum Illuminant {
 }
 
 impl Illuminant {
-    /// Get the `XyzValue` of the `Illuminant` type
-    pub fn xyz(self) -> XyzValue {
+    /// Get the `CieXyzValue` of the `Illuminant` type
+    pub fn xyz(self) -> CieXyzValue {
         Matrix3x1::from(self).into()
     }
 

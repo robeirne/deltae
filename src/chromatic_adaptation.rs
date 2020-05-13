@@ -54,8 +54,8 @@ impl From<ConeResponseDomain> for Matrix3x1 {
     }
 }
 
-impl XyzValue {
-    /// Adapt an `XyzValue` to another Illuminant using a given
+impl CieXyzValue {
+    /// Adapt an `CieXyzValue` to another Illuminant using a given
     /// `ChromaticAdaptationMethod`
     pub fn chrom_adapt(
         self,
