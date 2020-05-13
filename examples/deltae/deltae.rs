@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "lab" => color0.parse::<LabValue>()?.delta(color1.parse::<LabValue>()?, method),
         "lch" => color0.parse::<LchValue>()?.delta(color1.parse::<LchValue>()?, method),
         "xyz" => color0.parse::<XyzValue>()?.delta(color1.parse::<XyzValue>()?, method),
-        _ => unreachable!("COLORTYPE"),
+        _ => unreachable!("COLORTYPE: `{}`", color_type),
     };
 
     println!("{}", delta);

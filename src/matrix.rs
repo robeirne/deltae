@@ -36,6 +36,30 @@ macro_rules! matrix3x3 {
     };
 }
 
+/// Create a new [`Matrix3x1`] from a list of floats in column-major order
+///
+/// # Example
+///
+/// ```
+/// use deltae::{matrix3x1, matrix::Matrix3x1};
+///
+/// let matrix = matrix3x1![0.5767309; 0.1855540; 0.1881852;];
+///
+/// assert_eq!(matrix[2], 0.1881852);
+/// ```
+///
+/// [`Matrix3x1`]: matrix/struct.Matrix3x1.html
+#[macro_export]
+macro_rules! matrix3x1 {
+    [
+        $x:expr; $y:expr; $z:expr;
+    ] => {
+        Matrix3x1::new(
+            $x, $y, $z,
+        )
+    };
+}
+
 /// # A 3x3 matrix of floats
 ///
 /// |    | c     | o     | l     |

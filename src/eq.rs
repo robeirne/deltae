@@ -116,7 +116,8 @@ pub trait AlmostEq<Rhs, T> {
     fn almost_eq(&self, rhs: &Rhs) -> bool;
 }
 
-/// Convenience macro for the `AlmostEq` trait
+/// Convenience macro for the [`AlmostEq`] trait. Panics if the two items are not equivalent within
+/// the given tolerance.
 ///
 /// # Example
 ///
@@ -126,14 +127,21 @@ pub trait AlmostEq<Rhs, T> {
 /// assert_almost_eq!(1.000000_f32, 1.000001_f32);
 /// ```
 ///
+/// [`AlmostEq`]:trait.AlmostEq.html
 #[macro_export]
 macro_rules! assert_almost_eq {
-    ($lhs:expr, $rhs: expr) => {
-        assert!($lhs.almost_eq(&$rhs))
+    ($lhs:expr, $rhs:expr) => {
+        if !$lhs.almost_eq(&$rhs) {
+            panic!(
+                "assertion failed: `(left ~= right)`\n  left: `{:?}`\n right: `{:?}`",
+                $lhs, $rhs
+            );
+        }
     }
 }
 
-/// Convenience macro for the `AlmostEq` trait
+/// Convenience macro for the [`AlmostEq`] trait. Panics if the two items are equivalent within the
+/// given tolerance.
 ///
 /// # Example
 ///
@@ -143,10 +151,16 @@ macro_rules! assert_almost_eq {
 /// assert_almost_ne!(1.0_f32, 1.1_f32);
 /// ```
 ///
+/// [`AlmostEq`]:trait.AlmostEq.html
 #[macro_export]
 macro_rules! assert_almost_ne {
-    ($lhs:expr, $rhs: expr) => {
-        assert!(!$lhs.almost_eq(&$rhs))
+    ($lhs:expr, $rhs:expr) => {
+        if $lhs.almost_eq(&$rhs) {
+            panic!(
+                "assertion failed: `(left !~= right)`\n  left: `{:?}`\n right: `{:?}`",
+                $lhs, $rhs
+            );
+        }
     }
 }
 
@@ -177,5 +191,14 @@ impl AlmostEq<Self, f32> for DeltaE {
     fn almost_eq(&self, rhs: &Self) -> bool {
         self.method == rhs.method
             && self.value.almost_eq(&rhs.value)
+    }
+}
+
+impl AlmostEq<Self, f32> for LabValue {
+    const TOLERANCE: f32 = f32::TOLERANCE;
+    fn almost_eq(&self, rhs: &Self) -> bool {
+        self.l.almost_eq(&rhs.l)
+            && self.a.almost_eq(&rhs.a)
+            && self.b.almost_eq(&rhs.b)
     }
 }

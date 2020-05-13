@@ -11,6 +11,17 @@ pub enum ChromaticAdaptationMethod {
     VonKries,
 }
 
+impl ChromaticAdaptationMethod {
+    //! Returns the chromatic adaptation matrices `([MA], [MA]⁻¹)`
+    pub fn matrices(&self) -> (Matrix3x3, Matrix3x3) {
+        match self {
+            XyzScaling => (XYZ_SCALING, XYZ_SCALING),
+            Bradford => (BRADFORD, BRADFORD_INV),
+            VonKries => (VON_KRIES, VON_KRIES_INV),
+        }
+    }
+}
+
 pub struct ConeResponseDomain {
     rho: f32,
     gamma: f32,
@@ -49,31 +60,23 @@ impl XyzValue {
     pub fn chrom_adapt(
         self,
         method: ChromaticAdaptationMethod,
-        source: Illuminant,
-        dest: Illuminant
+        illum_source: Illuminant,
+        illum_dest: Illuminant
     ) -> Self {
-        let method_matrix = match method {
-            XyzScaling => XYZ_SCALING,
-            Bradford => BRADFORD,
-            VonKries => VON_KRIES,
-        };
+        // Return early if the source is the same as the destination
+        if illum_source == illum_dest {
+            return self;
+        }
 
-        let method_matrix_inv = match method {
-            XyzScaling => XYZ_SCALING,
-            Bradford => BRADFORD_INV,
-            VonKries => VON_KRIES_INV,
-        };
+        let (method_matrix, method_matrix_inv) = method.matrices();
 
-        let crd_source: ConeResponseDomain =
-            (method_matrix * Matrix3x1::from(source)).into();
-        let crd_dest: ConeResponseDomain =
-            (method_matrix * Matrix3x1::from(dest)).into();
-
+        let crd_source = illum_source.cone_response_domain(method_matrix);
+        let crd_dest = illum_dest.cone_response_domain(method_matrix);
         let scm = crd_source.scaled_component_matrix(crd_dest);
 
         let matrix = method_matrix_inv * scm * method_matrix;
 
-        (matrix * Matrix3x1::from(source)).into()
+        (matrix * Matrix3x1::from(self)).into()
     }
 }
 

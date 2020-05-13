@@ -106,14 +106,14 @@ pub(crate) fn rgb_to_xyz(rgb: RgbValue, rgb_system: RgbSystem) -> XyzValue {
 
 #[test]
 fn convert_rgb() {
-    let lab = LabValue::from(RgbValue::new(128, 128, 128));
-    dbg!("LAB from RGB", &lab);
-    let xyz = XyzValue::from(lab);
-    dbg!("XYZ from LAB from RGB", &xyz);
-    let xyz2= XyzValue::from(LabValue::new(53.585, 0.0,0.0).unwrap());
-    dbg!("XYZ from LAB", &xyz2);
-    let rgb = RgbValue::from(LabValue::new(53.585, 0.0, 0.0).unwrap());
-    dbg!("RGB from LAB", &rgb);
-    dbg!("DELTAE", lab.delta(rgb, DE2000));
-    assert!(lab.delta_eq(rgb, Tolerance::default()));
+    use chromatic_adaptation::*;
+    use illuminant::*;
+
+    let xyz = XyzValue::new(0.208137, 0.215861, 0.178130).unwrap();
+    let lab = LabValue::from(xyz);
+    dbg!(lab);
+    let exp = LabValue::new(53.5850, 0.0, 0.0).unwrap();
+    //assert_almost_eq!(lab, exp);
+
+    dbg!(xyz.chrom_adapt(Bradford, Illuminant::D50, Illuminant::D65));
 }
