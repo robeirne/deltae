@@ -1,5 +1,7 @@
 # deltae
 
+This repository has been archived in favor of [https://github.com/ryanobeirne/deltae](https://github.com/ryanobeirne/deltae).
+
 [![Github](https://github.com/ryanobeirne/deltae/workflows/Rust/badge.svg)](https://github.com/ryanobeirne/deltae/actions)
 [![Gitlab](https://gitlab.com/ryanobeirne/deltae/badges/master/pipeline.svg?ignore_skipped=true)](https://gitlab.com/ryanobeirne/deltae/pipelines)
 [![Documentation](https://docs.rs/deltae/badge.svg)](https://docs.rs/deltae)
